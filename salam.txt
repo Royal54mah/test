@@ -1,0 +1,5666 @@
+CoinEx API 文档 logo
+General
+Spot
+Futures
+繁體中文 English
+Search
+ 
+Market Data API
+Account API
+Trading API
+WebSocket
+CoinEx
+© 2017-2022 CoinEx.com. All rights reserved.
+
+Market Data API
+Acquire All Market List
+Example
+
+// Request
+
+// Response
+{
+    "code": 0,
+    "data": [
+        "LTCBCH",
+        "ETHBCH",
+        "ZECBCH",
+        "DASHBCH"
+    ],
+    "message": "Ok"
+}
+GET /market/list
+Get all market list, applicable to spot and margin markets
+Signature required: No
+Acquire All Market Info
+Example
+
+// Request
+
+// Response
+{
+  "code": 0,
+  "message": "Ok",
+  "data":
+  {
+    "XRPBTC": 
+    {
+      "taker_fee_rate": "0.001",
+      "pricing_name": "BTC",
+      "trading_name": "XRP",
+      "min_amount": "0.001",
+      "name": "XRPBTC",
+      "trading_decimal": 8,
+      "maker_fee_rate": "0.001",
+      "pricing_decimal": 8
+    },
+    "CETUSDC": 
+    {
+      "taker_fee_rate": "0.001",
+      "pricing_name": "USDC",
+      "trading_name": "CET",
+      "min_amount": "0.001",
+      "name": "CETUSDC",
+      "trading_decimal": 8,
+      "maker_fee_rate": "0.001",
+      "pricing_decimal": 8
+    }
+  }
+}
+GET /market/info
+Acquire all market details, applicable to spot and margin markets
+Signature required: No
+
+Return parameter description
+
+Name	Type	Description
+name	String	Market name
+taker_fee_rate	String	Taker rate
+maker_fee_rate	String	Maker rate
+min_amount	String	Min. transaction volume
+trading_name	String	Trading currency
+trading_decimal	Integer	Trading currency decimal
+pricing_name	String	Quote currency
+pricing_decimal	Integer	Quote currency decimal
+Acquire Single Market Info
+Example
+
+// Request
+market=BTCUSDT
+
+// Response
+{
+  "code": 0,
+  "message": "Ok",
+  "data":
+    {
+      "taker_fee_rate": "0.001",
+      "pricing_name": "USDT",
+      "trading_name": "BTC",
+      "min_amount": "0.001",
+      "name": "BTCUSDT",
+      "trading_decimal": 8,
+      "maker_fee_rate": "0.001",
+      "pricing_decimal": 8
+    }
+}
+GET /market/detail
+Get detailed information on a single market, applicable to spot and margin markets
+Signature required: No
+Request parameter description
+
+Name	Type	Required	Description
+market	String	Yes	Market name
+Return parameter description
+Same as Acquire All Market Info endpoint
+
+Acquire Market Depth
+Example
+
+// Request
+market=ETHUSDT
+&merge=0.01
+&limit=10
+
+// Response
+{
+  "code": 0,
+  "data": {
+    "last": "10.00",
+    "time": 1539764050033,
+    "asks": [
+      [
+        "10.00", 
+        "0.9999"
+      ]
+    ],
+    "bids": [
+      [
+        "10.00",
+        "1.0000"
+      ]
+    ]
+  },
+  "message": "Ok"
+}
+GET /market/depth
+Acquire market depth in a single market, suitable for spot and margin markets
+Signature required: No
+Max. depth 50
+
+Request parameter description
+
+Name	Type	Required	Description
+market	String	Yes	Market name
+merge	String	Yes	‘0’, ‘0.1’, ‘0.01’, ‘0.001’, ‘0.0001’, ‘0.00001’, ‘0.000001’, ‘0.0000001’, ‘0.00000001
+limit	Interger	No(Default20)	Return quantity, range: 5/10/20/50
+Return parameter description
+
+Name	Type	Description
+last	String	Latest Price
+time	Long	Depth update time
+asks	Array	Ask depth
+asks[0][0]	String	Order price
+asks[0][1]	String	Order amount
+bids	Array	Bid depth
+bids[0][0]	String	Order price
+bids[0][1]	String	Order amount
+Acquire Latest Transaction Data
+Example
+
+// Request
+market=ETHUSDT
+&last_id=0
+&limit=10
+
+// Response
+{
+  "code": 0,
+  "data": [
+    {
+      "amount": "0.0001",       # Transaction amount 
+      "date": 1494214689,       # Transaction time(s) 
+      "date_ms": 1494214689067, # Transaction time(ms)
+      "id": 5,                  # Transaction No
+      "price": "10.00",       # Transaction price
+      "type": "buy"             # Transaction type: buy, sell
+    }
+  ],
+  "message": "Ok"
+}
+GET /market/deals
+Get the latest transaction data of a single market, applicable to spot and margin markets
+Signature required: No
+Max. return of 1000 records
+
+Request parameter description
+
+Name	Type	Required	Description
+market	String	Yes	Market name
+last_id	Integer	No	Transaction ID, 0 means get from the latest record
+limit	Integer	No (default 100)	Max. 1000
+Return parameter description
+
+Name	Type	Description
+id	Integer	Transaction ID
+date	Integer	Transaction timestamp
+date_ms	Integer	Transaction millisecond timestamp
+amount	String	Trading volume
+price	String	Transaction price
+type	String	buy;
+sell;
+Acquire K-Line Data
+Example
+
+// Request
+market=ETHUSDT
+&type=1day
+&limit=10
+
+// Response
+{
+    "code": 0,
+    "data": [
+        [
+            1492358400,
+            "10.0",
+            "10.0",
+            "10.0",
+            "10.0",
+            "10",
+            "100",
+        ]
+    ],
+  "message": "Ok"
+}
+GET /market/kline
+Get k-line data of a single market, applicable to spot and margin markets
+Signature required: No
+Max. return of 1000 records
+
+Request parameter description
+
+Name	Type	Required	Description
+market	String	Yes	Market name
+limit	Integer	No (default 100)	Max. 1000
+type	String	Yes	1min:1min;
+3min:3min;
+5min:5min;
+15min:15min;
+30min:30min;
+1hour:1hour;
+
+:
+;
+4hour:4hour;
+6hour:6hour; 1day:1day;
+3day:3day;
+1week:1week;
+Return parameter description
+
+Name	Type	Description
+data[0][0]	Integer	Timestamp
+data[0][1]	String	Opening price
+data[0][2]	String	Closing price
+data[0][3]	String	Highest price
+data[0][4]	String	Lowest price
+data[0][5]	String	Trading volume
+data[0][6]	String	Trading value
+Acquire Single Market Statistics
+Example
+
+// Request
+market=ETHUSDT
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "date": 1513865441609,  # server time when returning
+        "ticker": {
+            "buy": "10.00",           # buy 1
+            "buy_amount": "10.00",    # buy 1 amount
+            "open": "10",             # highest price
+            "high": "10",             # highest price
+            "last": "10.00",          # latest price 
+            "low": "10",              # lowest price
+            "sell": "10.00",          # sell 1
+            "sell_amount": "0.78",    # sell 1 amount
+            "vol": "110"              # 24H volume
+        }
+    },
+  "message": "Ok"
+}
+GET /market/ticker
+Get statistics on a single market, applicable to spot and margin markets
+Signature required: No
+Request parameter description
+
+Name	Type	Required	Description
+market	String	Yes	Market name
+Return parameter description
+
+Name	Type	Description
+date	String	Server time
+last	String	Latest Price
+buy	String	Bid1 price
+buy_amount	String	Bid1 amount
+sell	String	Ask1 price
+sell_amount	String	Ask1 amount
+open	String	24H opening price
+high	String	24H highest price
+low	String	24H lowest price
+vol	String	24H volume
+Acquire All Market Statistics
+Example
+
+// Request
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "date": 1513865441609,
+        "ticker": {
+            "BCHBTC": {
+                "buy": "0.222",
+                "buy_amount": "0.1",
+                "open": "0.2322211",
+                "high": "0.2322211",
+                "last": "0.2322211",
+                "low": "0.222",
+                "sell": "0.3522211",
+                "sell_amount": "0.11",
+                "vol": "2.01430624"
+            },
+        }
+    },
+    "message": "Ok"
+}
+GET /market/ticker/all
+Get all market statistics, applicable to spot and margin markets
+Signature required: No
+Return parameter description
+Same as Acquire Single Market Statistics endpoint
+
+Acquire Currency Rate
+Example
+
+// Request
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "USDT_to_USD": "1.00128491",
+        "USDC_to_USD": "1",
+        "BTC_to_USD": "60079.09716983",
+        "BCH_to_USD": "600.770946",
+        "ETH_to_USD": "4163.84190845",
+        "CET_to_USD": "2.00256982"
+    },
+    "message": "Success"
+}
+GET /common/currency/rate
+Get the exchange rate of all cryptocurrencies to USD
+Signature required: No
+Return parameter: Exchange rate of each cryptocurrency to USD
+Acquire Asset Allocation
+Example
+
+// Request
+coin_type=CET
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "CET-CSC": {
+            "asset": "CET",
+            "chain": "CSC",
+            "can_deposit": true,
+            "can_withdraw": false,
+            "deposit_least_amount": "1",
+            "withdraw_least_amount": "1",
+            "withdraw_tx_fee": "0.1"
+        },
+        "CET-ERC20": {
+            "asset": "CET",
+            "chain": "ERC20",
+            "can_deposit": true,
+            "can_withdraw": false,
+            "deposit_least_amount": "14",
+            "withdraw_least_amount": "14",
+            "withdraw_tx_fee": "14"
+        }
+    },
+    "message": "Success"
+}
+GET /common/asset/config
+Get all asset allocation
+Signature required: No
+Request parameter description
+
+Name	Type	Required	Description
+coin_type	String	No	Coin name
+Return parameter description
+
+Name	Type	Description
+can_deposit	Bool	Deposit status
+can_withdraw	Bool	Withdrawal status
+deposit_least_amount	String	Min. deposit amount
+withdraw_least_amount	String	Min. withdrawal amount
+withdraw_tx_fee	String	Withdrawal rate
+withdrawal_precision	String	Withdrawal precision
+asset	String	Coin
+chain	String	The protocol type of the coin
+Acquire AMM Market List
+Example
+
+// Request
+
+// Response
+{
+    "code": 0,
+    "data": [
+        "CETUSDT",
+        "USDCUSDT",
+        "ETHBTC",
+        "ACMUSDT",
+        "ARDRUSDT",
+        "ARDRTUSD",
+        "AYAUSDT",
+        "AYAETH",
+        "KUNBTC",
+        "KUNBCH",
+        "KUNETH",
+        "KUNTUSD",
+        "LFTBTC",
+        "PAXUSDT",
+        "SNXUSDT",
+        "SNXBTC",
+        "SNXBCH",
+        "SNXETH",
+        "SYSUSDT",
+        "XRPUSDC",
+        "XRPETH"
+    ],
+    "message": "Success"
+}
+GET /amm/market
+Acquire AMM Market List
+Signature required: No
+Return parameter
+Acquire Margin Market List
+Example
+
+// Request
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "CETBCH": 3,
+        "BTCUSDC": 4,
+        "XRPPAX": 7,
+        "ETHUSDC": 9,
+        "BCHUSDT": 10,
+        "LTCUSDT": 11,
+        "XRPUSDT": 12,
+        "HCBTC": 13,
+        "ETHUSDT": 1,
+        "ETCUSDT": 15,
+        "BTCUSDT": 2,
+        "ETHBTC": 16,
+        "HCUSDT": 17,
+        "BSVUSDT": 19,
+        "OMGUSDT": 20,
+        "OMGUSDC": 22,
+        "OMGTUSD": 23,
+        "BANUSDT": 24,
+        "BANUSDC": 25
+    },
+    "message": "Success"
+}
+GET /margin/market
+Get the list of margin markets
+Signature required: No
+Request parameter: No
+Account API
+Acquire Account Balance Info
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "BTC": {
+            "available": "9080.84156954",
+            "frozen": "1"
+        },
+        "USDT": {
+            "available": "43724611.65252752",
+            "frozen": "1897.84472856"
+        },
+        "CET": {
+            "available": "6524.13695056",
+            "frozen": "0"
+        },
+        "ETH": {
+            "available": "10000",
+            "frozen": "0"
+        }
+    },
+    "message": "Success"
+}
+GET /balance/info
+Signature required: Yes
+Acquire account information, suitable for spot trading markets
+When the asset (available + frozen) is 0, no coin data is returned
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+
+Name	Description
+frozen	Amount frozen
+available	Amount available
+lock	Amount lock
+Acquire Balance in Sub-Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&sub_user_name=sub_user
+&coin_type=BTC
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "sun": {
+            "BTC": {
+                "available": "99",
+                "frozen": "0"
+            }
+        }
+    },
+    "message": "Success"
+}
+GET /sub_account/balance
+Signature required: Yes
+Acquire Balance in Sub-Account
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	No	Sub-account name
+coin_type	String	No	Coin name
+Return parameter description
+
+Name	Description
+available	Amount available
+frozen	Amount frozen
+Acquire Balance in AMM Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": [
+        {
+            "market": "ETHBTC",
+            "base_asset": "ETH",
+            "quote_asset": "BTC",
+            "base_amount": "944.24670636",
+            "quote_amount": "65.46687196"
+        }
+    ],
+    "message": "Success"
+}
+GET /account/amm/balance
+Signature required: Yes
+Acquire info in AMM Account
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+
+Name	Description
+market	Market
+base_asset	Base asset
+quote_asset	Quote asset
+base_amount	Base asset amount
+quote_amount	Quote asset amount
+Acquire Balance in Financial Account
+Example:
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": [
+        {
+            "asset": "CET",
+            "available": "0",
+            "frozen": "0"
+        },
+        {
+            "asset": "USDT",
+            "available": "999900",
+            "frozen": "0"
+        }
+    ],
+    "message": "Success"
+}
+GET /account/investment/balance
+
+Signature required: Yes
+
+Acquire info in Financial Account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+
+Name	Description
+asset	Asset
+available	Amount available
+frozen	Amount frozen
+Acquire Credit Info in Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "withdraw_rate": "1.4",
+        "trade_rate": "2",
+        "current_balance": "6506574.34065785",
+        "unflat_balance": "6336010.61421221",
+        "can_withdraw_balance": "6506574.34065785",
+        "can_trade_balance": "6506574.34065785",
+        "current_rate": "1.02691973"
+    },
+    "message": "Success"
+}
+GET /credit/info
+
+Signature required: Yes
+
+Acquire credit info in Account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+
+Name	Description
+withdraw_rate	Withdrawal risk rate
+trade_rate	Tradable risk rate
+current_balance	Market value of total assets
+unflat_balance	Market value of to-be-repaid
+can_withdraw_balance	Market value of available withdrawal
+can_trade_balance	Market value of tradable amount
+current_rate	Risk rate
+Acquire Market Info in Margin Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "account_id": 2,
+        "leverage": 10,
+        "market_type": "BTCUSDT",
+        "sell_asset_type": "BTC",
+        "buy_asset_type": "USDT",
+        "balance": {
+            "sell_type": "2",
+            "buy_type": "0"
+        },
+        "frozen": {
+            "sell_type": "0",
+            "buy_type": "0"
+        },
+        "loan": {
+            "sell_type": "0",
+            "buy_type": "0"
+        },
+        "interest": {
+            "sell_type": "0",
+            "buy_type": "0"
+        },
+        "can_transfer": {
+            "sell_type": "2",
+            "buy_type": "0"
+        },
+        "warn_rate": "",
+        "liquidation_price": ""
+    },
+    "message": "Success"
+}
+GET /margin/account
+Signature required: Yes
+Acquire market info in Margin Account
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+
+Name	Type	Description
+account_id	Integer	Margin account ID
+leverage	Integer	Max. leverage
+market_type	String	Market name
+sell_asset_type	String	Payment Type
+buy_asset_type	String	Pricing coin
+balance	Object	Assets
+frozen	Object	Amount frozen
+loan	Object	Loan amount
+interest	Object	Interest
+can_transfer	Object	Transferable amount
+warn_rate	String	Risk%
+liquidation_price	String	Liquidation price
+sell_type	String	Number of trading currencies
+buy_type	String	Number of quote currencies
+Margin Account Settings Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "market": "BTCUSDT",
+        "leverage": 10,
+        "day_rate": "0.0009",
+        "BTC": {
+            "min_amount": "0.001",
+            "max_amount": "100"
+        },
+        "USDT": {
+            "min_amount": "1",
+            "max_amount": "2000000"
+        }
+    },
+    "message": "Success"
+}
+GET /margin/config
+Signature required: Yes
+Query the setting information of a single margin transaction, including the maximum loan amount and interest rate.
+
+Request parameters:
+
+Name	Type	Required	Description
+market	String	No	Market name
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+
+Name	Type	Description
+max_amount	String	Max. loan amount
+min_amount	String	Max. loan amount
+leverage	Integer	Max. leverage
+day_rate	String	Daily interest rate
+market	String	Market
+Acquire Balance in Credit Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": [
+        {
+            "asset": "USDT",
+            "unflat_amount": "98.99999998",
+            "interest_amount": "259.29744279"
+        }
+    ],
+    "message": "Success"
+}
+GET /credit/balance
+
+Signature required: Yes
+
+Acquire balance in Credit Account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+
+Name	Description
+asset	Credit assets
+unflat_amount	Open balance
+intrest_amount	Total interest
+Acquire Deposit Record
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&coin_type=ETH
+&status=finish
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "has_next": false,
+        "curr_page": 1,
+        "count": 1,
+        "data": [
+            {
+                "coin_deposit_id": 14270229,
+                "create_time": 1637212022,
+                "amount": "200",
+                "amount_display": "200",
+                "diff_amount": "0",
+                "min_amount": "0",
+                "actual_amount": "200",
+                "actual_amount_display": "200",
+                "confirmations": 0,
+                "tx_id": "",
+                "tx_id_display": "XXXXXXXXXX",
+                "coin_address": "XXXXXXXXXX",
+                "coin_address_display": "XXXXXXXXXX",
+                "add_explorer": "",
+                "coin_type": "USDT",
+                "smart_contract_name": null,
+                "transfer_method": "local",
+                "status": "finish",
+                "status_display": "finish",
+                "remark": "",
+                "explorer": ""
+            }
+        ],
+        "total": 1,
+        "total_page": 1
+    },
+    "message": "Success"
+}
+GET /balance/coin/deposit
+Signature required: Yes
+Acquire deposit record
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+coin_type	String	No	Coin name
+tx_id	String	No	Transaction ID
+page	Interger	Yes	Page number, starting from 1
+Limit	Interger	Yes	Number per page, Max. 100
+Status	String	No	State
+processing: processing
+confirming: confirming
+cancel: cancelled
+finish: completed
+too_small: deposit amount is too small
+to_hot: transfer to hot wallet
+Return parameter description
+
+Name	Description
+actual_amount	Actual deposit amount
+actual_amount_display	Show actual deposit amount
+add_explorer	Deposit transfer address
+amount	Deposit amount
+amount_display	Show deposit amount
+coin_address	Deposit transfer address
+coin_address_display	Show deposit transfer address
+coin_deposit_id	Deposit id
+coin_type	Coin name
+confirmations	Number of confirmation
+create_time	Creation timestamp
+explorer	Explorer URL of the transaction
+remark	Remark
+status	Status
+status_display	Display status
+transfer_method	Trading method
+tx_id	Transaction ID
+tx_id_display	Show transaction ID
+min_amount	Min. deposit value
+smart_contract_name	Smart contract name
+User Operation History Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&asset=USDT
+&business=trade
+&account_id=0
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "time": 1636602204,
+                "account": 0,
+                "business": "trade",
+                "business_id": 35437896,
+                "asset": "BTC",
+                "change": "0.12995834",
+                "balance": "8748.45520473"
+            },
+            {
+                "time": 1636451914,
+                "account": 0,
+                "business": "trade",
+                "business_id": 35437896,
+                "asset": "USDT",
+                "change": "-6.70000000",
+                "balance": "42608970.78871773"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": true,
+        "count": 10
+    },
+    "message": "Success"
+}
+GET /account/balance/history
+Signature required: Yes
+Query user operation history
+Request parameter description
+Name	Type	Required	Description
+asset	String	No	assets
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+start_time	Integer	No	Query start time
+end_time	Integer	No	Query end time
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+business	String	No	Operation type
+trade: transaction
+withdraw: withdrawal
+deposit: deposit
+maker_cash_back: spot maker rebate
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+Name	Notes
+business_id	Business ID
+time	Creation time
+account	Account ID
+asset	Coin
+change	Change in assets
+balance	Balance after operation
+business	Operation type
+trade: transaction
+withdraw: withdrawal
+deposit: deposit
+maker_cash_back: spot maker rebate
+Acquire Trading Fee Rate
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&business_type=SPOT
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "taker": "0.0018",
+        "maker": "0.0018"
+    },
+    "message": "Success"
+}
+GET /account/market/fee
+
+Signature required: Yes
+
+Acquire trading fee rate
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+market	String	Yes	Market
+business_type	String	No	Transaction Type
+SPOT: Spot (default)
+PERPETUAL: Futures
+Return parameter description
+
+Name	Description
+taker	Taker rate
+maker	Maker rate
+Spot Asset Transfer Between Main and Sub-Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "transfer_account": "sub1",
+    "transfer_side": "out",
+    "coin_type": "USDT",
+    "amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "message": "Success",
+    "data": {}
+}
+
+POST /sub_account/transfer
+Signature required: Yes
+Spot Asset Transfer Between Main and Sub-Account
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+transfer_account	String	Yes	Sub-account name
+transfer_side	String	Yes	“in” means transfer to main account, “out” means transfer from main account
+coin_type	String	Yes	Coin name
+amount	String	Yes	Transfer amount
+Asset Transfer Between Spot - Margin Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "from_account": "0",
+    "to_account": "1",
+    "coin_type": "USDT",
+    "amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+POST /margin/transfer
+Signature required: Yes
+Asset transfer between Spot - Margin Account
+
+Request parameters:
+
+Name	Type	Required	Description
+from_account	Integer	Yes	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+to_account	Integer	Yes	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+coin_type	String	Yes	Coin name
+amount	String	Yes	Transfer amount
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+access_id	String	Yes	access_id
+Asset Transfer Between Spot - Futures Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "transfer_side": "in",
+    "coin_type": "USDT",
+    "amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+POST /contract/balance/transfer
+
+Signature required: Yes
+
+Asset transfer between Spot - Perpetual Account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+coin_type	String	Yes	Coin name
+transfer_side	String	Yes	Operation direction
+in: from Spot to Futures Account
+out: from Futures to Spot Account
+amount	String	Yes	Number of transfers
+Return parameter
+
+Submit Withdrawal Request
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "smart_contract_name": "CSC",
+    "coin_type": "USDT",
+    "coin_address": "0x3886be3128DEF4dEC006116acaf21750c0138Ad6",
+    "actual_amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "actual_amount": "1.00000000",
+        "amount": "1.00000000",
+        "coin_address": "1KAv3pazbTk2JnQ5xTo6fpKK7p1it2RzD4",
+        "coin_type": "BCH",
+        "coin_withdraw_id": 206,
+        "confirmations": 0,
+        "create_time": 1524228297,
+        "status": "audit",
+        "tx_fee": "0",
+        "tx_id": ""
+    },
+    "message": "Ok"
+}
+POST /balance/coin/withdraw
+Signature required: Yes
+Submit withdrawal request
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+coin_type	String	Yes	Coin name
+smart_contract_name	String	No	Required by cryptocurrencies that support multiple withdrawal network,
+such as USDT is supported on ERC20, Omni, TRC20
+coin_address	String	Yes	Authorized withdrawal address. For instance, if you are withdrawing
+XMR or XMC, you need to use “:” to combine “address” and “payment_id” into the form of “xxx:yyy”;
+When withdrawing XRP, you need to use “:” to combine “address” and “tag” “Combine into the form of “xxx:yyy”.
+You can fill in the mobile phone number or email address for Inter-user Transfer
+transfer_method	String	No	1. onchain - Onchain transfer 2. local - Inter-user transfer
+actual_amount	String	Yes	The actual amount of withdrawal refers to the amount one actually
+receives after deducting the service fee. For fee rates: https://www.coinex.com/fees
+Return parameter description
+
+Name	Description
+coin_withdraw_id	Withdrawal id
+create_time	Creation timestamp
+amount	Withdrawal amount
+actual_amount	Actual withdrawal amount
+tx_id	Transaction ID
+coin_address	Withdrawal address
+tx_fee	Trading fees
+confirmations	Number of confirmation
+coin_type	Coin name
+status	Withdrawal status
+Cancel Withdrawal Request
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&coin_withdraw_id=37503
+
+// Response
+{
+    "code": 0,
+    "data": {},
+    "message": "Ok"
+}
+DELETE /balance/coin/withdraw
+Signature required: Yes
+Cancel withdrawal request
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+coin_withdraw_id	Integer	Yes	Withdrawal record ID
+Margin Loan
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "coin_type": "USDT",
+    "market": "ETHUSDT",
+    "amount": "50",
+    "renew": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "loan_id": 1670
+    },
+    "message": "Success"
+}
+POST /margin/loan
+Signature required: Yes
+Loan cryptos in Margin Account
+Special frequency limit：5r/5s
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+market	String	Yes	Market name
+coin_type	String	Yes	Coin name
+amount	String	Yes	Loan amount
+renew	Integer	No	Whether to renew automatically
+0: No <br>1: Yes
+Return result:
+
+Name	Type	Description
+loan_id	Integer	Loan record ID
+Margin Repayment
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETCUSDT",
+    "coin_type": "USDT",
+    "amount": "50"
+}
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+POST /margin/flat
+Signature required: Yes
+Repay loan in Margin Account
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+market	String	Yes	Market name
+coin_type	String	Yes	Coin name
+amount	String	Yes	Paid amount
+loan_id	Integer	No	The ID of loan record, which is blank when the remaining amount of loan in the current market is paid off.
+Update Deposit Address
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "smart_contract_name": "TRC20"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "coin_address": "0x40aa234bcdc528ce411a6020da1a3c07124039d4",
+        "is_bitcoin_cash": false
+    },
+    "message": "Success"
+}
+PUT /balance/deposit/address/<string:coin_type>
+
+Signature required: Yes
+
+Update deposit address
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+smart_contract_name	Integer	No	If a certain coin support multiple networks, the protocol type must be specified.
+Currently, the multi-chain currencies are USDT, and smart_contract_name can be selected as Omni, ERC20, TRC20
+
+BTC, smart_contract_name can be CoinExChain, BTC
+
+BCH, smart_contract_name can be CoinExChain, BCH
+
+USDH, smart_contract_name can be CoinExChain, SLP
+
+CET, smart_contract_name can be CoinExChain, ERC20
+
+Return parameter description
+
+Name	Description
+coin_address	Deposit address
+is_bitcoin_cash	Whether it is Bitcoin Cash (BCH)
+Deposit Address Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&smart_contract_name=TRC20
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "coin_address": "0x40aa234bcdc528ce411a6020da1a3c07124039d4",
+        "is_bitcoin_cash": false
+    },
+    "message": "Success"
+}
+GET /balance/deposit/address/<string:coin_type>
+Signature required: Yes
+Inquire deposit address
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+smart_contract_name	Integer	No	If a certain coin support multiple networks, the protocol type must be specified.
+Currently, the multi-chain currencies are USDT, and smart_contract_name can be selected as Omni, ERC20, TRC20
+
+BTC, smart_contract_name can be CoinExChain, BTC
+
+BCH, smart_contract_name can be CoinExChain, BCH
+
+USDH, smart_contract_name can be CoinExChain, SLP
+
+CET, smart_contract_name can be CoinExChain, ERC20
+
+Return parameter description
+Name	Description
+coin_address	Deposit address
+is_bitcoin_cash	Whether it is Bitcoin Cash (BCH)
+Transfer Record Between Spot - Financial Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&asset=USDT
+&op_type=out
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "records": [
+            {
+                "id": 5063,
+                "created_at": 1636330200,
+                "updated_at": 1636330200,
+                "success_at": 1636330200,
+                "report_date": 1636329600,
+                "user_id": 305,
+                "investment_account_id": 2,
+                "asset": "BTC",
+                "amount": "0.00001052",
+                "opt_type": "INTEREST",
+                "day_rate": "0",
+                "status": "SUCCESS"
+            }
+        ],
+        "total": 495
+    },
+    "message": "Success"
+}
+GET /investment/transfer/history
+Transfer record between Spot - Financial Account
+Request parameter description
+Name	Type	Required	Description
+asset	String	No	Assets
+op_type	String	No	Operation
+IN: from Spot to Financial Account
+OUT: from Financial to Spot Account
+INTEREST: Interest
+start_time	Integer	No	Query start time
+end_time	Integer	No	Query end time
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+Return parameter description
+Name	Notes
+id	Transfer ID
+create_at	Creation time
+update_at	Update time
+success_at	Transfer completion time
+asset	Operated assets
+amount	Amount
+opt_type	Operation
+IN: from Spot to Financial Account
+OUT: from Financial to Spot Account
+INTEREST: Interest
+day_rate	Daily rate of return
+status	Status
+Acquire Transfer Record Between Main and Sub-Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&sub_user_name=sub1
+&coin_type=USDT
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "curr_page": 1,
+        "has_next": false,
+        "per_page": 10,
+        "total_page": 1,
+        "count": 4,
+        "data": [
+            {
+                "time": 1636443179,
+                "transfer_from": "sun",
+                "transfer_to": "",
+                "coin_type": "BTC",
+                "amount": "1",
+                "status": "success"
+            }
+        ],
+        "total": 4
+    },
+    "message": "Success"
+}
+GET /sub_account/transfer/history
+
+Signature required: Yes
+
+Acquire Transfer Record Between Main and Sub-Account
+
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	No	Sub-account name
+coin_type	String	No	Coin name
+start_time	Integer	No	Query start time (timestamp)
+end_time	Integer	No	Query end time (timestamp)
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of entries per page (Max. 500)
+Return parameter description
+
+Name	Description
+time	Transfer time
+transfer_from	Transfer sender
+transfer_to	Transfer receiver (Show either transfer sender or receiver by default)
+coin_type	Coin name
+amount	Transfer amount
+status	Transfer status
+Acquire Loan Record in Margin Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&status=finish
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "page": 1,
+        "limit": 10,
+        "total": 9,
+        "data": [
+            {
+                "loan_id": 1666,
+                "create_time": 1635736743,
+                "market_type": "BTCUSDT",
+                "coin_type": "BTC",
+                "day_rate": "0.0008",
+                "loan_amount": "99.99",
+                "unflat_amount": "0",
+                "expire_time": 1636600743,
+                "is_renew": true,
+                "status": "finish"
+            },
+            {
+                "loan_id": 1665,
+                "create_time": 1635736729,
+                "market_type": "BTCUSDT",
+                "coin_type": "BTC",
+                "day_rate": "0",
+                "loan_amount": "0.01",
+                "unflat_amount": "0",
+                "expire_time": 1636600729,
+                "is_renew": true,
+                "status": "finish"
+            }
+        ]
+    },
+    "message": "Success"
+}
+GET /margin/loan/history
+Signature required: Yes
+Acquire loan record in Margin Account
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+market	String	No	Market name
+status	String	No	Status
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 100
+Return result:
+
+Name	Type	Description
+loan_id	Integer	Loan record ID
+create_time	Integer	Creation timestamp
+market_type	String	Market name
+coin_type	String	Coin name
+loan_amount	String	Borrowed amount
+unflat_amount	String	Amount and interest to be repaid
+expire_time	Integer	Time of expiration
+is_renew	Integer	Whether to renew automatically, 0: Off; 1: On;
+day_rate	String	Daily interest rate
+status	String	Pass: In loan;
+Burst: Liquidated
+Arrears: In debt;
+Finish: Repaid;
+Transfer Record Between Spot - Futures Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&asset=USDT
+&transfer_type=transfer_in
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "records": [
+            {
+                "amount": "12",
+                "asset": "USDT",
+                "transfer_type": "transfer_out",
+                "created_at": 1637287786
+            },
+            {
+                "amount": "1",
+                "asset": "BTC",
+                "transfer_type": "transfer_in",
+                "created_at": 1637287666
+            },
+            {
+                "amount": "10002",
+                "asset": "USDT",
+                "transfer_type": "transfer_in",
+                "created_at": 1637287619
+            }
+        ],
+        "total": 3
+    },
+    "message": "Success"
+}
+GET /contract/transfer/history
+Transfer record between Spot - Perpetual Account
+Request parameter description
+Name	Type	Required	Description
+asset	String	No	Assets
+transfer_type	String	No	Operation
+transfer_in: from Spot to Futures Account
+transfer_out: from Futures to Spot Account
+start_time	Integer	No	Query start time
+end_time	Integer	No	Query end time
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter description
+Name	Notes
+create_at	Creation time
+asset	Operated assets
+amount	Amount
+transfer_type	Operation
+transfer_in: from Spot to Futures Account
+transfer_out: from Futures to Spot Account
+Transfer Record Between Margin - Spot Account
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&asset=USDT
+&transfer_type=in
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "records": [
+            {
+                "id": 2612,
+                "updated_at": 1635846838,
+                "user_id": 1527,
+                "from_account_id": 0,
+                "to_account_id": 2,
+                "asset": "BTC",
+                "amount": "1",
+                "balance": "2",
+                "transfer_type": "IN",
+                "status": "SUCCESS",
+                "created_at": 1635846838
+            }
+        ],
+        "total": 6
+    },
+    "message": "Success"
+}
+GET /margin/transfer/history
+Signature required: Yes
+Transfer record between Margin - Spot Account
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+asset	String	No	Asset type
+market	String	No	Market name
+transfer_type	String	No	From/To
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 1000
+start_time	Integer	No	Query start time
+end_time	Integer	No	Query end time
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+
+Name	Type	Description
+id	Integer	Record ID
+updated_at	Integer	Update time
+user_id	Integer	User ID
+from_account_id	Integer	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+to_account_id	Integer	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+asset	String	assets
+amount	String	Transfer amount
+balance	String	Account Balance
+transfer_type	String	Transfer direction, IN is to transfer TO Margin Account, OUT is to transfer FROM Margin Account
+status	String	Operation status
+created_at	Integer	Creation time
+Acquire Withdrawal History
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&coin_withdraw_id=37503
+&coin_type=USDT
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": [
+        {
+            "actual_amount": "1.00000000",
+            "amount": "1.00000000",
+            "coin_address": "1KAv3pazbTk2JnQ5xTo6fpKK7p1it2RzD4",
+            "coin_type": "BCH",
+            "coin_withdraw_id": 206,
+            "confirmations": 0,
+            "create_time": 1524228297,
+            "status": "audit",
+            "tx_fee": "0",
+            "tx_id": ""
+        },
+        {
+            "actual_amount": "0.10000000",
+            "amount": "0.10000000",
+            "coin_address": "15sr1VdyXQ6sVLqeJUJ1uPzLpmQtgUeBSB",
+            "coin_type": "BCH",
+            "coin_withdraw_id": 203,
+            "confirmations": 11,
+            "create_time": 1515806440,
+            "status": "finish",
+            "tx_fee": "0",
+            "tx_id": "896371d0e23d64d1cac65a0b7c9e9093d835affb572fec89dd4547277fbdd2f6"
+        },
+        {
+            "actual_amount": "0.01000000",
+            "amount": "0.01000000",
+            "coin_address": "1GVVx5UBddLKrckTprNi4VhHSymeQ8tsLF",
+            "coin_type": "BCH",
+            "coin_withdraw_id": 68,
+            "confirmations": 6,
+            "create_time": 1514978728,
+            "status": "finish",
+            "tx_fee": "0",
+            "tx_id": "f08802fea6745c07e420b92356cf3bcdaa78a00c4a062ef0b9e2de06a3f4d718"
+        },
+        {
+            "actual_amount": "0.00100000",
+            "amount": "0.00100000",
+            "coin_address": "1GVVx5UBddLKrckTprNi4VhHSymeQ8tsLF",
+            "coin_type": "BCH",
+            "coin_withdraw_id": 27,
+            "confirmations": 0,
+            "create_time": 1513933541,
+            "status": "cancel",
+            "tx_fee": "0",
+            "tx_id": ""
+        }
+    ],
+    "message": "Ok"
+}
+GET /balance/coin/withdraw
+Signature required: Yes
+Acquire withdrawal history
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+coin_type	String	No	Coin name
+coin_withdraw_id	Integer	No	Withdrawal record ID
+page	Interger	Yes	Page number, starting from 1
+Limit	Interger	Yes	Number per page, Max. 100
+Return parameter description
+
+Name	Description
+coin_withdraw_id	Withdrawal record ID
+create_time	Creation timestamp
+amount	Withdrawal amount
+actual_amount	Actual withdrawal amount
+tx_id	Transaction ID
+coin_address	To address
+tx_fee	Withdrawal fee
+confirmations	Number of confirmation
+coin_type	Coin name
+status	audit;
+pass;
+processing;
+confirming;
+not_pass;
+cancel;
+finish;
+fail;
+Create Sub-Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "sub_user_name": "sub2",
+    "permissions": [
+        "AMM",
+        "MARGIN"
+    ]
+}
+
+// Response
+{
+    "code": 0,
+    "message": "Success",
+    "data": {}
+}
+
+POST /sub_account/register
+Signature required: Yes
+Create sub-account (The maximum number of sub-accounts to create is 20)
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	Yes	Sub-account name
+permissions	List	No	Permission list, null for all permissions
+PERPETUAL: Futures trading permission
+MARGIN: Margin trading permission
+AMM: AMM function
+API: API management permission
+Cancel Disable Sub-Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "sub_user_name": "sub2"
+}
+
+// Response
+{
+    "code": 0,
+    "message": "Success",
+    "data": {}
+}
+PUT /sub_account/unfrozen
+Signature required: Yes
+Cancel Disable Sub-Account
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	Yes	Sub-account name
+Disable Sub-Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "sub_user_name": "sub2"
+}
+
+// Response
+{
+    "code": 0,
+    "message": "Success",
+    "data": {}
+}
+
+PUT /sub_account/frozen
+Signature required: Yes
+Disable Sub-Account
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	Yes	Sub-account name
+Edit Account Settings
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "cet_discount": "True"
+}
+
+// Response
+{
+    "code": 0,
+    "message": "Success",
+    "data": {}
+}
+
+PUT /v1/account/settings
+Signature required: Yes
+Edit account settings
+
+Request parameter description
+
+Name	Type	Required	Description
+cet_discount	Bool	No	Whether to activate CET deduction
+Create Sub-Account APIKEY
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "sub_user_name": "sub1",
+    "allow_trade": "True",
+    "allowed_ips": [
+        "1.1.1.1",
+        "1.1.1.2"
+    ],
+    "remark": "test"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "user_auth_id": 554,
+        "create_time": 1642145331,
+        "remark": "2233",
+        "access_id": "xxxxxxx",
+        "allowed_ips": [
+            "1.1.1.1"
+        ],
+        "allow_withdraw": false,
+        "allow_trade": true,
+        "is_expires": false,
+        "expired_time": 0,
+        "secret_key": "xxxxxx"
+    },
+    "message": "Success"
+}
+POST /sub_account/auth/api
+
+Signature required: Yes
+
+Create Sub-Account APIKEY
+
+Note: This API can only be called by the main account, and the maximum number of sub-accounts to create is 50, while the API management permission to the corresponding sub-accounts are also required.
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+allow_trade	Bool	Yes	Whether there is transaction permission, true: yes; false: no
+allowed_ips	List	Yes	Binding IP addresses (up to 50 can be bound)
+remark	String	No	API Remark
+sub_user_name	String	Yes	Sub-account username
+Return parameter
+
+Name	Description
+user_auth_id	Unique ID for APIKEY
+create_time	Creation time
+remark	API Remark
+access_id	access_id
+allowed_ips	Bound IP Address
+allow_withdraw	Whether to allow withdrawal
+allow_trade	Whether to allow transaction
+is_expires	Whether the APIKEY has expired (if an IP address is bound, it will never expire by default;
+If no IP address is bound, the APIKEY will be valid for 3 months)
+expired_time	Expiration time:
+0: Permanently valid
+secret_key	secret_key
+Acquire Sub-Account APIKEY List
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&sub_user_name=sub1
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "has_next": false,
+        "curr_page": 1,
+        "count": 7,
+        "data": [
+            {
+                "user_auth_id": 554,
+                "create_time": 1642145331,
+                "remark": "2233",
+                "access_id": "5EDFCD524C7046B6AD9D10A2510A5BC9",
+                "allowed_ips": [
+                    "1.1.1.1"
+                ],
+                "allow_withdraw": false,
+                "allow_trade": true,
+                "is_expires": false,
+                "expired_time": 0
+            }
+        ],
+        "total": 7,
+        "total_page": 1
+    },
+    "message": "Success"
+}
+GET /sub_account/auth/api
+
+Signature required: Yes
+
+Acquire Sub-Account APIKEY List
+
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+sub_user_name	String	Yes	Sub-account username
+Return parameter
+
+Name	Description
+user_auth_id	Unique ID for APIKEY
+create_time	Creation time
+remark	API Remark
+access_id	access_id
+allowed_ips	Bound IP Address
+allow_withdraw	Whether to allow withdrawal
+allow_trade	Whether to allow transaction
+is_expires	Whether the APIKEY has expired (if an IP address is bound, it will never expire by default;
+If no IP address is bound, the APIKEY will be valid for 3 months)
+expired_time	Expiration time:
+0: Permanently valid
+Acquire Sub-Account APIKEY Detail
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "user_auth_id": 554,
+        "create_time": 1642145331,
+        "remark": "2233",
+        "access_id": "5EDFCD524C7046B6AD9D10A2510A5BC9",
+        "allowed_ips": [
+            "1.1.1.1"
+        ],
+        "allow_withdraw": false,
+        "allow_trade": true,
+        "is_expires": false,
+        "expired_time": 0,
+        "secret_key": "xxxx"
+    },
+    "message": "Success"
+}
+GET /sub_account/auth/api/<int:user_auth_id>
+
+Signature required: Yes
+
+Acquire Sub-Account APIKEY Detail
+
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter
+
+Name	Description
+user_auth_id	Unique ID for APIKEY
+create_time	Creation time
+remark	API Remark
+access_id	access_id
+allowed_ips	Bound IP Address
+allow_withdraw	Whether to allow withdrawal
+allow_trade	Whether to allow transaction
+is_expires	Whether the APIKEY has expired (if an IP address is bound, it will never expire by default;
+If no IP address is bound, the APIKEY will be valid for 3 months)
+expired_time	Expiration time:
+0: Permanently valid
+secret_key	secret_key
+Edit Sub-Account APIKEY
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "sub_user_name": "sub1",
+    "allow_trade": "True",
+    "allowed_ips": [
+        "1.1.1.1",
+        "1.1.1.2"
+    ],
+    "remark": "test"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "user_auth_id": 554,
+        "create_time": 1642145331,
+        "remark": "API5",
+        "access_id": "5EDFCD524C7046B6AD9D10A2510A5BC9",
+        "allowed_ips": [],
+        "allow_withdraw": false,
+        "allow_trade": true,
+        "is_expires": false,
+        "expired_time": 1649924698,
+        "secret_key": "xxx"
+    },
+    "message": "Success"
+}
+PUT /sub_account/auth/api/<int:user_auth_id>
+
+Signature required: Yes
+
+Edit Sub-Account APIKEY
+
+Note: This API can only be called by the main account, and the API management permission to the corresponding sub-accounts are also required.
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+allow_trade	Bool	Yes	Whether there is transaction permission, true: yes; false: no
+allowed_ips	List	Yes	Binding IP addresses (up to 50 can be bound)
+remark	String	No	API Remark
+sub_user_name	String	Yes	Sub-account username
+Return parameter
+
+Name	Description
+user_auth_id	Unique ID for APIKEY
+create_time	Creation time
+remark	API Remark
+access_id	access_id
+allowed_ips	Bound IP Address
+allow_withdraw	Whether to allow withdrawal
+allow_trade	Whether to allow transaction
+is_expires	Whether the APIKEY has expired (if an IP address is bound, it will never expire by default;
+If no IP address is bound, the APIKEY will be valid for 3 months)
+expired_time	Expiration time:
+0: Permanently valid
+secret_key	secret_key
+Delete Sub-Account APIKEY
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {},
+    "message": "Success"
+}
+DELETE /sub_account/auth/api/<int:user_auth_id>
+
+Signature required: Yes
+
+Delete Sub-Account APIKEY
+
+Note: This API can only be called by the main account
+
+Request parameters
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return parameter
+
+Acquire Sub-Account List
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&sub_user_name=sub1
+&frozen=true
+&page=1
+&limit=100
+
+// Response
+{
+  "code": 0,
+  "data": {
+    "curr_page": 1,
+    "has_next": false,
+    "per_page": 10,
+    "total_page": 1,
+    "count": 1,
+    "data": [
+      {
+        "user_name": "test_sub",
+        "permissions": [
+          "PERPETUAL",
+          "MARGIN",
+          "AMM",
+          "API"
+        ],
+        "frozen": false,
+        "managed": false,
+        "balance_usd": "0.8"
+      }
+    ],
+    "total": 1
+  },
+  "message": "Success"
+}
+GET /sub_account/list
+
+Signature required: Yes
+Acquire Sub-Account List
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+sub_user_name	String	No	Sub-account username
+frozen	Bool	No	Whether to disable
+Return parameter
+
+Name	Description
+user_name	Sub-account username
+frozen	Whether to disable
+managed	Whether to authorize
+balance_usd	Asset market value
+permissions	Permission List
+PERPETUAL: Futures trading permission
+MARGIN: Margin trading permission
+AMM: AMM function
+API: API management permission
+General Asset Transfer in Sub-Accounts
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "from_user_name": "sub1",
+    "to_user_name": "sub2",
+    "from_account_type": "SPOT",
+    "to_account_type": "SPOT",
+    "asset": "USDT",
+    "amount": "1"
+}
+
+// Response
+{
+  "code": 0,
+  "message": "Success",
+  "data": {}
+}
+
+POST /sub_account/universal-transfer
+
+Signature required: Yes
+General Asset Transfer in Sub-Accounts
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+from_user_name	String	No	Transfer out sub-account name
+to_user_name	String	No	Transfer in sub-account name
+from_account_type	String	Yes	Transfer from
+PERPETUAL: Futures Account
+SPOT: Spot Account
+to_account_type	String	Yes	Transfer to
+PERPETUAL: Futures Account
+SPOT: Spot Account
+asset	String	Yes	Coin name
+amount	String	Yes	Transfer amount
+Provide at least one request parameters, from_user_name or to_user_name
+The transfer between sub-accounts, that only allows transfers from Spot account to Spot account in sub-accounts
+If from_user_name is null, the default is to transfer from the main account
+If to_user_name is null, the default is to transfer to the main account
+Authorize Sub-Account
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "email": "test@coinex.com",
+    "remark": "test",
+    "sub_user_name": "sub2"
+}
+
+// Response
+
+{
+  "code": 0,
+  "data": {
+    "email": "test@gmail.com",
+    "id": 54,
+    "remark": "123,",
+    "sub_user_name": "test_sub]"
+  },
+  "message": "Success"
+}
+
+POST /sub_account/authorize
+
+Signature required: Yes
+Authorize Sub-Account
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+sub_user_name	String	Yes	Sub-account name
+email	String	Yes	Authorizee Email
+remark	String	No	Remark, no more than 50 characters
+Return parameter
+
+Name	Description
+id	Authorized Unique ID
+sub_user_name	Sub-account username
+email	Authorizee Email
+remark	Remark
+Acquire Sub-Account Authorizee List
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&sub_user_name=sub2
+&page=1
+&limit=100
+
+// Response
+{
+  "code": 0,
+  "data": {
+    "count": 1,
+    "curr_page": 1,
+    "data": [
+      {
+        "email": "test@gmail.com",
+        "id": 54,
+        "remark": "test_remark",
+        "sub_user_name": "test_sub"
+      }
+    ],
+    "has_next": false,
+    "total": 1,
+    "total_page": 1
+  },
+  "message": "Success"
+}
+
+GET /sub_account/authorize
+
+Signature required: Yes
+Acquire Sub-Account Authorizee List
+Note: This API can only be called by the main account
+
+Request parameter description
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+page	Integer	Yes	Number of pages
+limit	Integer	Yes	Number of items per page
+sub_user_name	String	Yes	Sub-account username
+Return parameter
+
+Name	Description
+id	Authorized Unique ID
+sub_user_name	Sub-account username
+email	Authorizee Email
+remark	Remark
+Delete Sub-Account Authorization
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {},
+    "message": "Success"
+}
+DELETE /sub_account/authorize/<int:id>
+
+Signature required: Yes
+Delete Sub-Account Authorization
+Note: This API can only be called by the main account
+
+Request parameters
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Trading API
+Submit Limit Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "type": "buy",
+    "price": "1100",
+    "amount": "1",
+    "account_id": 0,
+    "client_id": "client1",
+    "source_id": "source1",
+    "hide": true,
+    "option": "NORMAL"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35435972,
+        "create_time": 1636019392,
+        "finished_time": null,
+        "amount": "0.01000000",
+        "price": "56000",
+        "deal_amount": "0.01",
+        "deal_money": "560.0000000000000000",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "0.313600000000000000000000",
+        "fee_asset": "CET",
+        "fee_discount": "0.70",
+        "avg_price": "56000",
+        "market": "BTCUSDT",
+        "left": "0.00000000",
+        "maker_fee_rate": "0.0016",
+        "taker_fee_rate": "0.0016",
+        "order_type": "limit",
+        "type": "buy",
+        "status": "done",
+        "client_id": "abcd222",
+        "source_id": "1234"
+    },
+    "message": "Success"
+}
+POST /order/limit
+Signature required: Yes
+Submit Limit Order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	Key ID
+market	String	Yes	Market name
+type	String	Yes	Operation
+sell: ask order;
+buy: bid order;
+amount	String	Yes	Order amount, the minimum order amount is determined by the market
+price	String	Yes	Order price, accurate to 8 decimals
+source_id	String	No	User-defined number and return
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+client_id	String	No	client_id is the custom ID of the order.Currently it only supports uppercase and lowercase letters, numbers, hyphens and underscores, and within 32 bytes limit.
+hide	Bool	No	Whether to hide the submission
+true: hidden
+false: not hidden
+option	String	No	Order strategy (default is NORMAL)
+Normal: NORMAL,
+Immediate or Cancel: IOC,
+Fill or Kill: FOK,
+Maker Only: MAKER_ONLY
+Return result:
+
+Name	Type	Description
+amount	String	Order amount
+avg_price	String	Avg. transaction price
+create_time	Interger	Order time
+deal_amount	String	Executed amount
+deal_money	String	Volume
+finished_time	Interger	Complete time
+id	Interger	Order No.
+maker_fee_rate	String	Maker rate
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+status	String	not_deal: not executed;
+part_deal: partially executed;
+done: filled;
+taker_fee_rate	String	Taker rate
+type	String	sell: ask order;
+buy: bid order;
+client_id	String	client_id: User-defined order ID
+stock_fee	String	Trading fee calculated in base coin
+money_fee	String	Trading fee calculated in quote coin
+asset_fee	String	The amount of coins used to pay for the trading fees
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+left	String	The remaining Unexecuted amount of the order
+source_id	String	User-defined source_id
+Submit Limit Orders In Batch
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "account_id": 0,
+    "batch_orders": "[{\"type\":\"buy\",\"amount\":\"1\",\"price\":\"1100\"}]"
+}
+
+// Response
+{
+    "code": 0,
+    "data": [
+        {
+            "code": 0,
+            "data": {
+                "id": 35435969,
+                "create_time": 1636018159,
+                "finished_time": null,
+                "amount": "0.01000000",
+                "price": "56000",
+                "deal_amount": "0.01",
+                "deal_money": "560.0000000000000000",
+                "deal_fee": "0.896000000000000000000000",
+                "stock_fee": "0",
+                "money_fee": "0.896000000000000000000000",
+                "asset_fee": "0",
+                "fee_asset": null,
+                "fee_discount": "1",
+                "avg_price": "56000",
+                "market": "BTCUSDT",
+                "left": "0.00000000",
+                "maker_fee_rate": "0.0016",
+                "taker_fee_rate": "0.0016",
+                "order_type": "limit",
+                "type": "buy",
+                "status": "done",
+                "client_id": "",
+                "source_id": "1236"
+            },
+            "message": "OK"
+        } 
+    ],
+    "message": "Success"
+}
+POST /order/limit/batch
+Signature required: Yes
+Submit limit orders in batches or submit multiple limit orders in the same market, and the maximum amount is 100 orders
+
+Request parameters:
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+batch_orders	String(json)	Yes	Multi-order json format string
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Batch_orders parameter description
+Name	Type	Required	Description	 	type	String	Yes	sell: sell order;
+buy: buy order;	 	amount	String	Yes	order amount, the min. order amount is determined by the market	 	price	String	Yes	Order price: 8-digit decimal	 	source_id	String	no	user-defined id	8-digit decimal	 	source_id	String	no	user-defined id
+Return result:
+See Submit Limit Order endpoint
+
+Submit Market Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "type": "buy",
+    "amount": "1",
+    "asset": "ETH",
+    "account_id": 0,
+    "client_id": "client1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35435973,
+        "create_time": 1636020409,
+        "finished_time": null,
+        "amount": "1.00000000",
+        "amount_asset": "BTC",
+        "price": "0",
+        "deal_amount": "1",
+        "deal_money": "54334.4024000000000000",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "30.427265344000000000000000",
+        "fee_asset": "CET",
+        "fee_discount": "0.70",
+        "avg_price": "54334.4024",
+        "market": "BTCUSDT",
+        "left": "0.00000000",
+        "maker_fee_rate": "0",
+        "taker_fee_rate": "0.0016",
+        "order_type": "market",
+        "type": "sell",
+        "status": "done",
+        "client_id": "",
+        "source_id": "1234"
+    },
+    "message": "Success"
+}
+POST /order/market
+Signature required: Yes
+Submit market orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+type	String	Yes	sell: ask order;
+buy: bid order;
+amount	String	Yes	Order amount, the minimum order amount is determined by the market
+asset	String	No	Order currency, the sell order defaults to the trading currency, while the buy order defaults to the quote currency
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+client_id	String	No	client_id is the custom ID of the order. Currently it only supports uppercase and lowercase letters, numbers, hyphens and underscores, and within 32 bytes limit.
+Return result:
+See Submit Limit Order endpoint
+
+Submit IOC Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "type": "buy",
+    "price": "1100",
+    "amount": "1",
+    "account_id": 0,
+    "client_id": "client1",
+    "source_id": "source1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35436205,
+        "create_time": 1636080705,
+        "finished_time": null,
+        "amount": "0.30000000",
+        "price": "56000",
+        "deal_amount": "0.24721428",
+        "deal_money": "13843.9996800000000000",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "8.721719798400000000000000",
+        "fee_asset": "CET",
+        "fee_discount": "0.70",
+        "avg_price": "56000",
+        "market": "BTCUSDT",
+        "left": "0.05278572",
+        "maker_fee_rate": "0.0018",
+        "taker_fee_rate": "0.0018",
+        "order_type": "limit",
+        "type": "buy",
+        "status": "cancel",
+        "client_id": "abcd222",
+        "source_id": "1234"
+    },
+    "message": "Success"
+}
+POST /order/ioc
+Signature required: Yes
+Submit IOC(Immediate or Cancel) orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+type	String	Yes	sell: ask order;
+buy: bid order;
+amount	String	Yes	Order amount, the minimum order amount is determined by the market
+price	String	Yes	Order price, determined by the market
+source_id	String	No	User-defined id
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+client_id	String	No	client_id is the custom ID of the order. Currently it only supports uppercase and lowercase letters, numbers, hyphens and underscores, and within 32 bytes limit.
+Return result:
+See Submit Limit Order endpoint
+
+Submit Stop-Limit Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "type": "buy",
+    "price": "1100",
+    "stop_price": "1000",
+    "amount": "1",
+    "account_id": 0,
+    "client_id": "client1",
+    "source_id": "source1",
+    "hide": true,
+    "option": "NORMAL"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "status": "success"
+    },
+    "message": "Success"
+}
+POST /order/stop/limit
+Signature required: Yes
+Submit stop-market order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	Key ID
+market	String	Yes	Market name
+type	String	Yes	Operation
+sell: ask order;
+buy: bid order;
+amount	String	Yes	Order amount, the minimum order amount is determined by the market
+price	String	Yes	Order price, accurate to 8 decimals
+source_id	String	No	User-defined number and return
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+client_id	String	No	client_id is the custom ID of the order. Currently it only supports uppercase and lowercase letters, numbers, hyphens and underscores, and within 32 bytes limit.
+hide	Bool	No	Whether to hide the submission
+true: hidden
+false: not hidden
+option	String	No	Order strategy (default is NORMAL)
+Normal: NORMAL,
+Immediate or Cancel: IOC,
+Fill or Kill: FOK,
+Maker Only: MAKER_ONLY
+stop_price	String	Yes	Stop price, accurate to 8 decimals
+Return result:
+Submit Stop-Market Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "type": "buy",
+    "amount": "1",
+    "asset": "ETH",
+    "stop_price": "1000",
+    "account_id": 0,
+    "client_id": "client1",
+    "source_id": "source1",
+    "hide": true,
+    "option": "NORMAL"
+}
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+POST /order/stop/market
+Signature required: Yes
+Submit stop-market order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	Key ID
+market	String	Yes	Market name
+type	String	Yes	Operation
+sell: ask order;
+buy: bid order;
+amount	String	Yes	Order amount, the minimum order amount is determined by the market
+asset	String	No	Asset coin, trading coin by default
+source_id	String	No	User-defined number and return
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+client_id	String	No	client_id is the custom ID of the order. Currently it only supports uppercase and lowercase letters, numbers, hyphens and underscores, and within 32 bytes limit.
+hide	Bool	No	Whether to hide the submission
+true: hidden
+false: not hidden
+option	String	No	Order strategy (default is NORMAL)
+Normal: NORMAL,
+Immediate or Cancel: IOC,
+Fill or Kill: FOK,
+Maker Only: MAKER_ONLY
+stop_price	String	Yes	Stop price, accurate to 8 decimals
+Return result:
+Order Status Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&id=420291
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35436205,
+        "account_id": 0,
+        "create_time": 1636080705,
+        "finished_time": 1636080705,
+        "amount": "0.3",
+        "amount_asset": "BTC",
+        "price": "56000",
+        "deal_amount": "0.24721428",
+        "deal_money": "13843.99968",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "8.7217197984",
+        "fee_asset": "CET",
+        "fee_discount": "0.7",
+        "avg_price": "56000",
+        "market": "BTCUSDT",
+        "left": "0",
+        "maker_fee_rate": "0.0018",
+        "taker_fee_rate": "0.0018",
+        "order_type": "limit",
+        "type": "buy",
+        "status": "cancel",
+        "client_id": "abcd222"
+    },
+    "message": "Success"
+}
+GET /order/status
+Signature required: Yes
+Order Status Query
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+id	Interger	Yes	Order No.
+market	String	Yes	Market name
+tonce	Interger	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+
+Name	Type	Description
+id	Integer	Order No.
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+type	String	sell: ask order;
+buy: bid order;
+create_time	Integer	Order timestamp
+finished_time	Integer	Order completion timestamp
+status	String	not_deal: not executed(order pending);
+part_deal: partially executed(order pending);
+done: filled(order completed);
+cancel: order cancelled(order completed);
+To ensure server performance, all cancelled orders will not be saved
+amount	String	Order volume
+deal_amount	String	Executed amount
+left	String	The remaining Unexecuted amount of the order
+avg_price	String	Average price
+deal_money	String	Executed value
+maker_fee_rate	String	Maker rate
+taker_fee_rate	String	Taker rate
+deal_fee	String	Transaction fees
+stock_fee	String	Trading fee calculated in base coin
+money_fee	String	Trading fee calculated in quote coin
+asset_fee	String	The amount of coins used to pay for the trading fees
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+Order Status Query In Batch
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&batch_ids=420291,420292
+
+// Response
+{
+  "code": 0,
+  "data": [
+    {
+      "code": 0,
+      "data": {
+        "id": 35435975,
+        "account_id": 0,
+        "create_time": 1636020972,
+        "finished_time": 1636020972,
+        "amount": "1000",
+        "amount_asset": "BTC",
+        "price": "0",
+        "deal_amount": "811.88590061",
+        "deal_money": "43814713.2324293",
+        "deal_fee": "60763.149707616",
+        "stock_fee": "0",
+        "money_fee": "60763.149707616",
+        "asset_fee": "3269.137012494808",
+        "fee_asset": "CET",
+        "fee_discount": "0.7",
+        "avg_price": "53966.58963963985619139301",
+        "market": "BTCUSDT",
+        "left": "0",
+        "maker_fee_rate": "0",
+        "taker_fee_rate": "0.0016",
+        "order_type": "market",
+        "type": "sell",
+        "status": "done",
+        "client_id": ""
+      },
+      "message": ""
+    }
+  ],
+  "message": "Success"
+}
+GET /order/status/batch
+Signature required: Yes
+Order Status Query
+
+Request parameters:
+
+Name	type	Required	Description
+access_id	String	Yes	access_id
+batch_ids	String	Yes	Order IDs separated by comma, such as : “1,2,3”
+market	String	Yes	Market name
+tonce	Interger	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+See Order Status Query endpoint
+
+Executed Order Detail Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&id=462672
+&account_id=0
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "id": 462672,
+                "order_id": null,
+                "create_time": 1636020972,
+                "role": "taker",
+                "price": "45010",
+                "amount": "0.21728593",
+                "fee": "5.476822237208",
+                "fee_asset": "CET",
+                "deal_money": "9780.0397093"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 6
+    },
+    "message": "Success"
+}
+GET /order/deals
+Signature required: Yes
+Executed Order Detail Query
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+id	Interger	Yes	Order No.
+page	Interger	Yes	Page number, starting from 1
+limit	Interger	Yes	Number per page, Max. 100
+tonce	Interger	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Return result:
+
+Name	Type	Description
+amount	String	Executed amount
+create_time	Interger	Order timestamp
+deal_money	String	Executed value
+fee	String	Trading fee (calculated by fee_asset converted into USD)
+fee_asset	String	Assets used to pay for the trading fees
+id	Interger	Execution id
+price	String	Unit price
+role	String	Order type Taker/Maker
+type	String	sell: ask order;
+buy: bid order
+Stop Order History Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "account_id": 0,
+                "order_id": 35436626,
+                "create_time": 1636104319,
+                "amount": "0.01",
+                "price": "59000",
+                "stop_price": "55999",
+                "fee_asset": "CET",
+                "fee_discount": "0.7",
+                "market": "BTCUSDT",
+                "order_type": "limit",
+                "type": "buy",
+                "status": "active"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 7
+    },
+    "message": "Success"
+}
+GET /order/stop/finished
+Signature required: Yes
+Stop Order History Query
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	No	Market name
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 100
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Return result:
+
+Name	Type	Description
+amount	String	Order volume
+stop_price	String	Stop Price
+create_time	Integer	Order timestamp
+account_id	Integer	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+status	String	not_deal: not executed(order pending);
+part_deal: partially executed(order pending);
+done: filled(order completed);
+cancel: order cancelled(order completed);
+To ensure server performance, all cancelled orders will not be saved
+order_id	Integer	Order No.
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+type	String	sell: ask order;
+buy: bid order;
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+Unexecuted Order Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&type=buy
+&client_id=client1
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "id": 35436199,
+                "account_id": 0,
+                "create_time": 1636079744,
+                "finished_time": null,
+                "amount": "1.00000000",
+                "amount_asset": "BTC",
+                "price": "51000",
+                "deal_amount": "0",
+                "deal_money": "0",
+                "deal_fee": "0",
+                "stock_fee": "0",
+                "money_fee": "0",
+                "asset_fee": "0",
+                "fee_asset": "CET",
+                "fee_discount": "0.7000",
+                "avg_price": "0.00",
+                "market": "BTCUSDT",
+                "left": "1.00000000",
+                "maker_fee_rate": "0.0018",
+                "taker_fee_rate": "0.0018",
+                "order_type": "limit",
+                "type": "buy",
+                "status": "not_deal",
+                "client_id": "abcd222"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 4,
+        "total": 4
+    },
+    "message": "Success"
+}
+GET /order/pending
+Signature required: Yes
+Inquire unexecuted orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	No	Market name
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 100
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	sell: ask order;
+buy: bid order;
+client_id	String	No	client_id is the custom ID of the order. Orders with the same client_id can be queried in batches.
+Return result:
+Name	Type	Description
+id	Integer	Order No.
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+type	String	sell: ask order;
+buy: bid order;
+create_time	Integer	Order timestamp
+finished_time	Integer	Order completion timestamp
+status	String	not_deal: not executed(order pending);
+part_deal: partially executed(order pending);
+done: filled(order completed);
+cancel: order cancelled(order completed);
+To ensure server performance, all cancelled orders will not be saved
+amount	String	Order volume
+deal_amount	String	Executed amount
+left	String	The remaining Unexecuted amount of the order
+avg_price	String	Average price
+deal_money	String	Executed value
+maker_fee_rate	String	Maker rate
+taker_fee_rate	String	Taker rate
+deal_fee	String	Transaction fees
+stock_fee	String	Trading fee calculated in base coin
+money_fee	String	Trading fee calculated in quote coin
+asset_fee	String	The amount of coins used to pay for the trading fees
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+client_id	String	User-defined order id
+Order History Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&type=buy
+&client_id=client1
+&stop_order_id=423842
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+
+            {
+                "id": 35435967,
+                "account_id": 0,
+                "create_time": 1636011309,
+                "finished_time": 1636011309,
+                "amount": "0.01",
+                "amount_asset": "BTC",
+                "price": "56000",
+                "deal_amount": "0.01",
+                "deal_money": "560",
+                "deal_fee": "0.896",
+                "stock_fee": "0",
+                "money_fee": "0.896",
+                "asset_fee": "0",
+                "fee_asset": "",
+                "fee_discount": "1",
+                "avg_price": "56000",
+                "market": "BTCUSDT",
+                "left": "0",
+                "maker_fee_rate": "0.0016",
+                "taker_fee_rate": "0.0016",
+                "order_type": "limit",
+                "type": "buy",
+                "status": "done",
+                "client_id": "abcd222"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 8
+    },
+    "message": "Success"
+}
+GET /order/finished
+Signature required: Yes
+Order History Query
+
+Request parameters:
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	No	Market name
+start_time	Integer	Yes	Start time
+end_time	Integer	Yes	End time
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 100
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	sell: ask order;
+buy: bid order;
+client_id	String	No	User-defined id
+stop_order_id	Integer	No	Stop order ID
+Return result:
+See Unexecuted Order Query endpoint
+
+Unexecuted Stop Order Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&type=buy
+&client_id=client1
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "account_id": 0,
+                "order_id": 35436627,
+                "create_time": 1636104345,
+                "amount": "0.01000000",
+                "price": "59000",
+                "stop_price": "54999",
+                "taker_fee": "0.0018",
+                "maker_fee": "0.0018",
+                "state": 1,
+                "fee_asset": "CET",
+                "fee_discount": "0.7000",
+                "market": "BTCUSDT",
+                "order_type": "limit",
+                "type": "buy",
+                "client_id": "abcd222"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 1,
+        "total": 1
+    },
+    "message": "Success"
+}
+GET /order/stop/pending
+Signature required: Yes
+Inquire unexecuted stop orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	No	Market name
+page	Integer	Yes	Page number, starting from 1
+limit	Integer	Yes	Number of entries per page, Max. 100
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	Operation
+sell: ask order;
+buy: bid order;
+client_id	String	No	client_id is the custom ID of the order. Orders with the same client_id can be queried in batches.
+Return result:
+
+Name	Type	Description
+amount	String	Order volume
+stop_price	String	Stop Price
+create_time	Integer	Order timestamp
+account_id	Integer	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+state	Integer	The relationship between the stop price of a stop order and the current market price
+1: Lower than the price in the current market
+2: Higher than the price in the current market
+order_id	Integer	Order No.
+maker_fee	String	Maker rate
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+taker_fee	String	Taker rate
+type	String	sell: ask order;
+buy: bid order;
+client_id	String	User-defined order id
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+User Transaction Record Query
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&type=buy
+&start_time=1636451914
+&end_time=1681724907
+&page=1
+&limit=100
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "data": [
+            {
+                "id": 462666,
+                "order_id": 35435973,
+                "account_id": 0,
+                "create_time": 1636020409,
+                "type": "sell",
+                "role": "taker",
+                "price": "54000",
+                "amount": "0.6655976",
+                "fee": "20.127671424",
+                "fee_asset": "CET",
+                "market": "BTCUSDT",
+                "deal_money": "35942.2704"
+            }
+        ],
+        "curr_page": 1,
+        "has_next": false,
+        "count": 2
+    },
+    "message": "Success"
+}
+GET /order/user/deals
+Signature required: Yes
+User Transaction Record Query
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	No	Market name
+page	Interger	Yes	Page number, starting from 1
+limit	Interger	Yes	Number per page, Max. 100
+tonce	Interger	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	sell: ask order;
+buy: bid order;
+start_time	Integer	No	Start time
+end_time	Integer	No	End Time
+Return result:
+See Executed Order Detail Query endpoint
+
+Cancel Order
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&id=462672
+&market=ETHUSDT
+&account_id=0
+&type=buy
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35436612,
+        "account_id": 2,
+        "create_time": 1636098643,
+        "finished_time": null,
+        "amount": "1.00000000",
+        "price": "62443",
+        "deal_amount": "0",
+        "deal_money": "0",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "0",
+        "fee_asset": "CET",
+        "fee_discount": "0.70",
+        "avg_price": "0.00",
+        "market": "BTCUSDT",
+        "left": "1.00000000",
+        "maker_fee_rate": "0.0018",
+        "taker_fee_rate": "0.0018",
+        "order_type": "limit",
+        "type": "sell",
+        "status": "not_deal",
+        "client_id": ""
+    },
+    "message": "Success"
+}
+DELETE /order/pending
+Signature required: Yes
+Cancel orders
+Submission limit: 200 requests/10s
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+id	Integer	No	Order ID
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	No	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	sell: ask order;
+buy: bid order;
+Return result:
+
+Name	Type	Description
+id	Integer	Order No.
+market	String	Market name
+order_type	String	limit: limit order;
+market: market order;
+price	String	Order price
+type	String	sell: ask order;
+buy: bid order;
+create_time	Integer	Order timestamp
+finished_time	Integer	Order completion timestamp
+status	String	not_deal: not executed(order pending);
+part_deal: partially executed(order pending);
+done: filled(order completed);
+cancel: order cancelled(order completed);
+To ensure server performance, all cancelled orders will not be saved
+amount	String	Order volume
+deal_amount	String	Executed amount
+left	String	The remaining Unexecuted amount of the order
+avg_price	String	Average price
+deal_money	String	Executed value
+maker_fee_rate	String	Maker rate
+taker_fee_rate	String	Taker rate
+deal_fee	String	Transaction fees
+stock_fee	String	Trading fee calculated in base coin
+money_fee	String	Trading fee calculated in quote coin
+asset_fee	String	The amount of coins used to pay for the trading fees
+fee_asset	String	Payment of trading fee
+fee_discount	String	Rate discount
+source_id	String	User-defined source_id
+Cancel Orders In Batch
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&batch_ids=462672,462673
+&market=ETHUSDT
+&account_id=0
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+DELETE /order/pending/batch
+Signature required: Yes
+Cancel orders in batches, Max. 100 per time
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+batch_ids	String	Yes	Order IDs separated by comma, such as : “1,2,3”
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Return result:
+See Cancel Order endpoint
+
+Cancel All Orders
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+
+// Response
+{
+  "code": 0,
+  "data": {
+  },
+  "message": "Ok"
+}
+DELETE /order/pending
+Signature required: Yes
+Cancel All Orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Cancel Unexecuted Stop Order
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&type=buy
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+Delete /order/stop/pending/<int:order_id>
+Signature required: Yes
+Cancel Unexecuted Stop Order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+type	String	No	sell: ask order;
+buy: bid order;
+Return result:
+Cancel All Unexecuted Stop Orders
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+
+// Response
+{
+    "code": 0,
+    "data": null,
+    "message": "Success"
+}
+Delete /order/stop/pending
+Signature required: Yes
+Cancel All Unexecuted Stop Orders
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+Return result:
+Acquire User Trading Fee Rate
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "spot": {
+            "ALL": {
+                "taker": "0",
+                "maker": "0"
+            }
+        },
+        "perpetual": {
+            "ALL": {
+                "taker": "0.00025",
+                "maker": "-0.00025"
+            }
+        }
+    },
+    "message": "Success"
+}
+GET /order/user/trade/fee
+
+Acquire user trading fee rate
+
+Signature required: Yes
+
+Request parameter: No
+
+Return parameter description
+
+Name	Type	Description
+spot	object	Spot trading fees
+perpetual	object	Futures trading fees
+taker	String	Taker rate
+maker	String	Maker rate
+Note: It takes 10 minutes to get the actual trading fee rate after the API is created
+
+Acquire Market Transaction Info
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "CETUSDT": {
+            "maker_fee_rate": "0.003",
+            "taker_fee_rate": "0.003",
+            "depths": [
+                "0.1",
+                "0.01",
+                "0.001",
+                "0.0001",
+                "0.00001",
+                "0.000001",
+                "0.0000001",
+                "0.00000001"
+            ],
+            "is_amm_market": true
+        },
+        "CETUSDC": {
+            "maker_fee_rate": "0.001",
+            "taker_fee_rate": "0.001",
+            "depths": [
+                "0.0001",
+                "0.00001",
+                "0.000001",
+                "0.0000001",
+                "0.00000001"
+            ],
+            "is_amm_market": false
+        }
+
+    },
+    "message": "Success"
+}
+GET /order/market/trade/info
+
+Acquire market transaction info
+
+Signature required: No
+
+Request parameter: No
+
+Return parameter description
+
+Name	Type	Description
+maker_fee_rate	String	Maker rate
+taker_fee_rate	String	Taker rate
+depth	List	Depth list
+is_amm_market	bool	Whether it is an AMM market
+Modify a normal order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "id": 462672,
+    "price": "1100",
+    "amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "id": 35436205,
+        "create_time": 1636080705,
+        "finished_time": null,
+        "amount": "0.30000000",
+        "price": "56000",
+        "deal_amount": "0.24721428",
+        "deal_money": "13843.9996800000000000",
+        "deal_fee": "0",
+        "stock_fee": "0",
+        "money_fee": "0",
+        "asset_fee": "8.721719798400000000000000",
+        "fee_asset": "CET",
+        "fee_discount": "0.70",
+        "avg_price": "56000",
+        "market": "BTCUSDT",
+        "left": "0.05278572",
+        "maker_fee_rate": "0.0018",
+        "taker_fee_rate": "0.0018",
+        "order_type": "limit",
+        "type": "buy",
+        "status": "cancel",
+        "client_id": "abcd222",
+        "source_id": "1234"
+    },
+    "message": "Success"
+}
+POST /order/modify
+Signature required: Yes
+Modify a normal order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+id	Interger	Yes	Order No.
+amount	String	No	Order amount, the minimum order amount is determined by the market
+price	String	No	Order price, determined by the market
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+See Submit Limit Order endpoint
+
+Modify Stop Order
+Example
+
+// Request
+{
+    "access_id": "4DA36FFC61334695A66F8D29020EB589",
+    "tonce": 1513746038205,
+    "market": "ETHUSDT",
+    "id": 462672,
+    "price": "1100",
+    "stop_price": "1000",
+    "amount": "1"
+}
+
+// Response
+{
+    "code": 0,
+    "data": {
+        "status": "success"
+    },
+    "message": "Success"
+}
+POST /order/stop/modify
+Signature required: Yes
+Modify Stop Order
+
+Request parameters:
+
+Name	Type	Required	Description
+access_id	String	Yes	Key Id
+market	String	Yes	Market name
+id	Interger	Yes	Order No.
+amount	String	No	Order amount, the minimum order amount is determined by the market
+price	String	No	Order price, accurate to 8 decimals
+stop_price	String	No	Stop price, accurate to 8 decimals
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Return result:
+Cancel Orders By client_id
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&client_id=client1
+
+// Response
+{
+  "code": 0,
+  "data": [
+    {
+      "code": 0,
+      "order": {
+        "id": 35435975,
+        "account_id": 0,
+        "create_time": 1636020972,
+        "finished_time": 1636020972,
+        "amount": "1000",
+        "price": "0",
+        "deal_amount": "811.88590061",
+        "deal_money": "43814713.2324293",
+        "deal_fee": "60763.149707616",
+        "stock_fee": "0",
+        "money_fee": "60763.149707616",
+        "asset_fee": "3269.137012494808",
+        "fee_asset": "CET",
+        "fee_discount": "0.7",
+        "avg_price": "53966.58963963985619139301",
+        "market": "BTCUSDT",
+        "left": "0",
+        "maker_fee_rate": "0",
+        "taker_fee_rate": "0.0016",
+        "order_type": "market",
+        "type": "sell",
+        "status": "done",
+        "client_id": ""
+      },
+      "message": ""
+    }
+  ],
+  "message": "Ok"
+}
+DELETE /order/pending/by_client_id
+Signature required: Yes
+Cancel Orders By client_id
+
+Request parameters:
+
+name	type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+client_id	String	Yes	client_id is the custom ID of the order. Orders with the same client_id can be cancelled in batches.
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+Cancel Stop Orders By client_id
+Example
+
+// Request
+access_id=4DA36FFC61334695A66F8D29020EB589
+&tonce=1513746038205
+&market=ETHUSDT
+&account_id=0
+&client_id=client1
+
+// Response
+{
+  "code": 0,
+  "data": [
+    {
+      "code": 0,
+      "order": {
+        "id": 35435975,
+        "account_id": 0,
+        "create_time": 1636020972,
+        "finished_time": 1636020972,
+        "amount": "1000",
+        "price": "0",
+        "deal_amount": "811.88590061",
+        "deal_money": "43814713.2324293",
+        "deal_fee": "60763.149707616",
+        "stock_fee": "0",
+        "money_fee": "60763.149707616",
+        "asset_fee": "3269.137012494808",
+        "fee_asset": "CET",
+        "fee_discount": "0.7",
+        "avg_price": "53966.58963963985619139301",
+        "market": "BTCUSDT",
+        "left": "0",
+        "maker_fee_rate": "0",
+        "taker_fee_rate": "0.0016",
+        "order_type": "market",
+        "type": "sell",
+        "status": "done",
+        "client_id": ""
+      },
+      "message": ""
+    }
+  ],
+  "message": "Ok"
+}
+DELETE /order/stop/pending/by_client_id
+Signature required: Yes
+Cancel stop orders by client_id
+
+Request parameters:
+
+name	type	Required	Description
+access_id	String	Yes	access_id
+market	String	Yes	Market name
+client_id	String	Yes	client_id is the custom ID of the order. Orders with the same client_id can be cancelled in batches.
+account_id	Integer	no	Spot account ID: 0,
+Margin account ID: See Acquire Market Info in Margin Account
+tonce	Integer	Yes	Millisecond timestamp, the acceptable error range from server time is ±60s
+WebSocket
+Notes
+The websocket address is wss://socket.coinex.com/
+
+If you repeatedly subscribe to the same data in a connection, the previous subscription will be canceled
+
+Compressed request
+When trying to connect, you need to configure compression using Deflate algorithm, under reference standard RFC7692, whose feature is supported in most developers’ tool libraries, and all you need is configuration.
+
+The following example is the Python code implementation of websockets
+
+import websockets
+
+websockets.connect(..., compression='deflate')
+Request parameter description:
+method: method, String.
+params: parameters, Array.
+id: request id, Integer
+Request example:
+
+{
+  "id": 4,
+  "method": "state.subscribe",
+  "params": []
+}
+Return result
+
+result: Json object, empty means failure.
+error: Json object, empty means success, non-empty means failure.
+code: error code
+message: error message
+id: request id, Integer.
+Return example
+
+//success
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+
+//success with result
+{
+  "error": null
+  "id": 4,
+  "result": {}
+}
+
+//error
+{
+  "error": {
+    "code": 1,
+    "message": ""
+  },
+  "id": 4,
+  "result": null
+}
+
+Push
+
+method: method, String
+params: parameters, Array
+id: Null
+Push example:
+
+{
+  "id": null,
+  "method": "state.update",
+  "params": []
+}
+Error code description
+Error Code	Error message	Description
+1	invalid argument	Contract invalid argument
+2	internal error	Contract internal error
+3	service unavailable	Service unavailable
+4	method not found	No method found
+5	service timeout	Service timeout
+6	require auth	Authorization required
+7	too quick	Visit too frequent
+Authorization
+Example:
+
+// Request
+{
+  "method": "server.sign",
+  "params": [
+    "4DA36FFC61334695A66F8D29020EB589",
+    "C6F0DDA352101C2258F992A277397F4A",
+
+ 
+  ],
+  "id":
+
+// Response8
+{
+  "error": null,
+  "result": {
+    "status": "success"
+  },
+  "id": 15
+}
+method: “server.sign”
+Request parameter description:
+
+Name	Type	Required	Description
+access_id	String	Yes	access_id
+sign_data	String	Yes	Encrypt the string “access_id={access_id}&tonce={tonce}&secret_key={secret_key}” using the 32-bit MD5 algorithm, and convert the encrypted result to uppercase
+timestamp	Interger	Yes	Timestamp, milliseconds, the difference between the server timestamp and the server timestamp cannot be more than 1 minute
+Return parameter description:
+
+Name	Type	Description
+status	String	Request result, when the authentication is successful, the return value is “success”, and the authentication failure information exists in the error field
+Ping
+Example:
+
+// Request
+{
+  "method":"server.ping",
+  "params":[],
+  "id": 11
+}
+
+// Response
+{
+  "error": null,
+  "result": "pong",
+  "id": 11
+}
+method: “server.ping”
+Return parameter description:
+
+Name	Type	Description
+result	String	“pong”
+System Time
+Example:
+
+// Request
+{
+  "method":"server.time",
+  "params":[],
+  "id": 11
+}
+
+// Response
+{
+  "error": null,
+  "result": 1493285895,
+  "id": 11
+}
+method: “server.time”
+Return parameter description:
+
+Name	Type	Description
+timestamp	Integer	Timestamp, unit: seconds
+K-Line Query
+Example:
+
+// Request
+{
+  "method":"kline.query",
+  "params":[
+    "BTCUSDT",
+    1639982322,
+    1639985922,
+    60
+  ],
+  "id": 5
+}
+
+// Response
+{
+  "error": null, 
+  "result": [
+    [
+      1639982280,
+      "46324.37",
+      "46345.71",
+      "46356.11",
+      "46324.37",
+      "0.20288204",
+      "9402"
+    ]
+  ],
+  "id": 5
+}
+method: “kline.query”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	start_time, start time
+params[2]	Integer	Yes	end_time, end time
+params[3]	Integer	Yes	period, period, 1min, 5min, 15min, 30min, 1hour, 2hour, 4hour, 6hour, 12hour, 1day, 3day, 1week
+Return parameter description:
+
+Name	Type	Description
+result[0][0]	Integer	Timestamp
+result[0][1]	String	Opening price
+result[0][2]	String	Closing price
+result[0][3]	String	Highest price
+result[0][4]	String	Lowest price
+result[0][5]	String	Amount
+result[0][6]	String	Value
+Market Status Query
+Example:
+
+// Request
+{
+  "method": "state.query",
+  "params": [
+    "BTCUSD",
+    86400,
+  ],
+  "id":15
+}
+
+// Response
+{
+  "error ": null, 
+  "result": {
+    "open": "47598.70",
+    "last": "46318.55",
+    "high": "48262.66",
+    "low": "46111.11",
+    "deal" : "26883503.6092410415",
+    "volume": "572.07705108",
+    "sell_total": "11.74193255",
+    "buy_total": "6.76222116",
+    "period": 86400
+  },
+  "id": 15
+}
+method: “state.query”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	period, period, e.g. 86400 is the past 24 hours
+Return parameter description
+
+Name	Type	Description
+open	String	Opening price
+last	String	Price
+high	String	Highest price
+low	String	Lowest price
+deal	String	Total Trading Value
+volume	String	Total transaction volume
+sell_total	String	Ask order amount
+buy_total	String	Bid order amount
+period	Integer	Period
+Market Status Subscription
+Example:
+
+// Request
+{
+  "method": "state.subscribe",
+  "params": [
+    "BTCUSD"
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “state.subscribe”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name, null to subscribe to all markets
+Return parameter description:
+
+Name	type	Description
+result	String	Subscription results
+Market Status Push
+Example:
+
+// Notify
+{
+  "method": "state.update", 
+  "params": [{
+    "BTCUSD": {
+      "open": "47598.70",
+      "last": "46318.55",
+      "high ": "48262.66",
+      "low": "46111.11",
+      "deal": "26883503.6092410415",
+      "volume": "572.07705108",
+      "sell_total": "11.74193255",
+      "buy_total": "6.76222116" ,
+      "period": 86400
+    },
+  }], 
+  "id": 15
+}
+method: “state.update”
+Push parameter description:
+
+Name	Type	Description
+open	String	Opening price
+last	String	Price
+high	String	Highest price
+low	String	Lowest price
+deal	String	Total Trading Value
+volume	String	Total transaction volume
+sell_total	String	Ask order amount
+buy_total	String	Bid order amount
+period	Integer	Period
+Cancel Market Status Subscription
+Example:
+
+// Request
+{
+  "method": "state.unsubscribe",
+  "params": [],
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “state.unsubscribe”
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Latest Transaction Query
+Example:
+
+// Request
+{
+  "method":"deals.query",
+  "params":[
+    "BTCUSD",
+    10,
+    0
+  ],
+  "id":16
+}
+
+// Response
+{
+  "error": null, 
+  "result": [
+    {
+      "type": "sell",
+      "time": 1496458040.059284,
+      "price": "46444.74",
+      "id": 29433,
+      "amount" : "0.00120000"
+    }
+  ],
+  "id": 16
+}
+method: “deals.query”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	limit, the number of records obtained
+params[2]	Integer	Yes	last_id, the largest ID of the last returned result
+Return parameter description:
+
+Name	Type	Description
+type	String	Type, “sell”: sell, “buy”: buy
+time	Float	Timestamp
+price	String	Price
+id	Integer	No.
+amount	String	Amount
+Latest Transaction Query of User
+Example:
+
+// Request
+{
+  "method":"deals.query_user",
+  "params":[
+    12,
+    "BTCUSDT",
+    1,
+    1639982322,
+    1639985922,
+    0,
+    10
+  ],
+  "id ":16
+}
+
+// Response
+{
+  "error": null, 
+  "result": [
+    {
+      "type": "sell",
+      "time": 1496458040.059284,
+      "price": "46444.74" ,
+      "id": 29433,
+      "amount": "0.00120000"
+    }
+  ],
+  "id": 16
+}
+method: “deals.query_user”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	Integer	Yes	account, account
+spot account: 0
+margin account: See Acquire Market Info in Margin Account
+For querying all accounts: -1
+For querying account transactions that are > 0 : -2
+params[1]	String	Yes	market, market name
+params[2]	Integer	Yes	side, tx direction, 0: all, 1: sell, 2: buy
+params[3]	Integer	Yes	start_time, start time, 0: no limit
+params[4]	Integer	Yes	end_time, end time, 0: no limit
+params[5]	Integer	Yes	offset, that is, from which one to get
+params[6]	Integer	Yes	limit, the number of records obtained
+Return parameter description:
+
+Name	Type	Description
+type	String	Type, “sell”: sell, “buy”: buy
+time	Float	Timestamp
+price	String	Price
+id	Integer	No.
+amount	String	Amount
+Latest Transaction Subscription
+Example:
+
+// Request
+{
+  "method": "deals.subscribe",
+  "params": [
+    "BTCUSDT"
+  ],
+  "id": 16
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “deals.subscribe”
+Request parameter description:
+Name	Type	Required	Description
+params	Array\<String\>	No	Market list, empty to subscribe to all markets
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Latest Transaction Push
+Example:
+
+// Notify
+{
+  "method": "deals.update", 
+  "params": [
+    "BTCUSD",
+    [
+      {
+        "type": "sell",
+        "time": 1496458040.059284,
+        "price ": "46444.74",
+        "id": 29433,
+        "amount": "0.00120000"
+      }
+    ]
+  ], 
+  "id": null
+}
+method: “deals.update”
+Push parameter description:
+
+Name	Type	Description
+params[0]	String	Market
+type	String	Type, “sell”: sell, “buy”: buy
+time	float	Timestamp
+price	String	Price
+id	Integer	No.
+amount	String	Amount
+Cancel Latest Transaction Subscription
+Example:
+
+// Request
+{
+  "method":"deals.unsubscribe",
+  "params":[],
+  "id":16
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “deals.unsubscribe”
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Market Depth Query
+Example:
+
+// Request
+{
+  "method": "depth.query",
+  "params": [
+    "BTCUSDT",
+    10,
+    "0" 
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "asks": [
+      [
+        "46350.52",
+        "1.07871851"
+      ],
+      ... ],
+    "bids": [
+      [
+        "46349.61",
+        "0.04000000"
+      ],
+      ... ],
+    "last": "46349.93",
+    "time": 1639987469166,
+    "checksum": 1533284725
+  },
+  "id": 15
+}
+method: “depth.query”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	limit, number of records obtained, one of [5, 10, 20, 50]
+params[2]	Integer	Yes	interval, merge market depth, the value is one of the values in [“10”, “1”, “0”, “0.1”, “0.01”]
+Return parameter description:
+
+Name	Type	Description
+last	String	Price
+time	Integer	Timestamp
+checksum	Integer	The checksum is a signed 32-bit integer of the full depth data, used to verify the accuracy of the depth data.
+1.Construct the checksum string: bid1_price:bid1_amount:bid2_price:bid2_amount:ask1_price:ask1_amout:… (if there is no bid, the checksum string will be ask1_price:ask1_amount:ask2_price:ask2_amount:…)
+2. Use crc32 algorithm to encode the checksum string
+asks[0][0]	String	Ask1 price
+asks[0][1]	String	Ask1 amount
+bids[0][0]	String	Bid1 price
+bids[0][1]	String	Bid1 amount
+Market Depth Subscription
+Example:
+
+// Request
+{
+  "method": "depth.subscribe",
+  "params": [
+    "BTCUSDT",
+    10, 
+    "0",
+    true
+  ],
+  "id": 15
+}
+
+/ / Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “depth.subscribe”
+Note: all previous market depth subscriptions will be cancelled, when this command is called
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	limit, number of records obtained, one of [5, 10, 20, 50]
+params[2]	Integer	Yes	interval, market depth aggregation level, one of String [“10”, “1”, “0”, “0.1”, “0.01”]
+params[3]	Bool	No	diff, true: incremental subscription, false: full subscription, default is true
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Multi-Market Depth Subscription
+Example:
+
+// Request
+{
+  "method": "depth.subscribe_multi",
+  "params": [
+    ["BTCUSDT", 10, "0", true],
+    ["ETHUSDT", 10, "0", false],
+  ] ,
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “depth.subscribe_multi”
+Note: all previous market depth subscriptions will be cancelled, when this command is called
+Request parameter description:
+
+Name	Type	Required	Description
+params[0][0]	String	Yes	market, market name
+params[0][1]	Integer	Yes	limit, number of records obtained, one of [5, 10, 20, 50]
+params[0][2]	Integer	Yes	interval, market depth aggregation level, one of String [“10”, “1”, “0”, “0.1”, “0.01”]
+params[0][3]	Bool	No	diff, true: incremental subscription, false: full subscription, default is true
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Market Depth Push
+Example:
+
+// Notify
+{
+  "method": "depth.update", 
+  "params": [
+    false,
+    {
+      "asks": [
+        ["46350.52", "1.07871851"],
+        ... ] ,
+      "bids": [
+        ["46349.61", "0.04000000"],
+        ... ],
+      "last": "46349.93",
+      "time": 1639987469166,
+      "checksum": 1533284725
+    },
+    "BTCUSDT"
+  ], 
+  "id": null
+}
+method: “depth.update”
+Push parameter description:
+Params [0] indicates whether it is an incremental push or a full push.
+Incremental push: Each push only delivers the depth data updated from the last push to the present time. In every 200 milliseconds. No push if there is no deep update.
+Full push: Each push delivers the complete depth data. In every 200 milliseconds. No push if there is no deep update.
+For multiple market subscriptions, use the params [2] to separate push messages in different markets.
+Full market depth push is delivered every 1 minute.
+Push parameter description:
+
+Name	Type	Description
+params[0]	Bool	true: full result, false: incremental result result
+last	String	Price
+time	Integer	Timestamp
+checksum	Integer	The checksum is a signed 32-bit integer of the full depth data, used to verify the accuracy of the depth data.
+1.The checksum can only be calculated based on the full results.If it is an incremental subscription, the full results need to be calculated first.
+2. Construct the checksum string：bid1_price:bid1_amount:bid2_price:bid2_amount:ask1_price:ask1_amout:… (if there is no bid, the checksum string will be ask1_price:ask1_amount:ask2_price:ask2_amount:…)
+3.
+asks[n][0]	String	Ask price
+asks[n][1]	String	Ask amount, When it is 0, delete this depth; if not, replace
+bids[n][0]	String	Bid price
+bids[n][1]	String	Bid amount, When it is 0, delete this depth; if not, replace
+params[2]	String	market, market name
+Cancel Market Depth Subscription
+Example:
+
+// Request
+{
+  "method":"depth.unsubscribe",
+  "params":[],
+  "id":15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “depth.unsubscribe”
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Cancel Multi-Market Depth Subscription
+Example:
+
+// Request
+{
+  "method":"depth.unsubscribe_multi",
+  "params":[],
+  "id":15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “depth.unsubscribe_multi”
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Order Query
+Example:
+
+// Request
+{
+  "method": "order.query",
+  "params": [
+    "BTCUSDT",
+    0,
+    0,
+    10
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "records": [{
+      "asset_fee": "0",
+      "account": 1,
+      "money_fee": "0",
+      "stock_fee ": "0",
+      "ctime": 1558680350.41878,
+      "maker_fee": "0.0001",
+      "price": "0.01900000",
+      "deal_stock": "0",
+      "fee_discount": "0.9000",
+      "side": 1,
+      "source": "api",
+      "amount": "1.00000000",
+      "user": 553,
+      "mtime": 1558680350.41878,
+      "fee_asset": "CET",
+      "deal_money ": "0",
+      "left": "1.00000000",
+      "type": 1,
+      "id": 303,
+      "market": "BTCUSDT",
+      "taker_fee": "0.0001",
+      "client_id" ": "test_123",
+      "stop_id": 0
+    }], 
+    "total": 1,
+    "limit": 100,
+    "offset": 0
+  },
+  "id": 15
+}
+method: “order.query”
+Note: This endpoint only queries orders with account 0
+Authorization: required, refer to server.sign
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	side, 0: all, 1: sell, 2: buy
+params[2]	Integer	Yes	offset, that is, from which one to get
+params[3]	Integer	Yes	limit, the number of records obtained
+Return parameter description:
+
+Name	Type	Description
+total	Integer	Number of order results returned
+limit	Integer	Number of records obtained
+offset	Integer	Offset
+asset_fee	String	Number of payment currencies deducted as trading fees
+account	Integer	Account, spot account: 0
+money_fee	String	Trading fee calculated in quote coin
+stock_fee	String	Trading fee calculated in base coin
+ctime	Float	Create time
+maker_fee	String	Maker rate
+price	String	Price
+deal_stock	String	Transaction value
+fee_discount	String	Rate discount
+source	String	Source
+side	Integer	1: ask order, 2: bid order
+amount	String	Order amount, the minimum order amount is determined by the market
+user	Integer	User ID
+mtime	Float	Update time
+fee_asset	String	Payment coin deducted as trading fees
+deal_money	String	Volume
+left	String	Remaining unexecuted volume
+type	Integer	1: limit order, 2: market order
+id	Integer	Order id
+market	String	Market name
+taker_fee	String	Taker rate
+client_id	String	Client-defined id
+stop_id	Integer	Stop order id
+Stop Order Query
+Example:
+
+// Request
+{
+  "method": "order.query_stop",
+  "params": [
+    "BTCUSDT",
+    2,
+    0,
+    10
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "limit":10,
+    "offset":0,
+    "total":1,
+    "records":[
+      {
+        "id":259 ,
+        "type":2,
+        "side":2,
+        "user":1415,
+        "account":0,
+        "option":68,
+        "state":1,
+        "ctime":1640483195.167732,
+        "mtime":1640483195.167732,
+        "market":"BTCUSDT",
+        "source":"http_api_test",
+        "client_id":"",
+        "stop_price":"54999.00000000",
+        "price":"0" ,
+        "amount":"100000.00000000",
+        "taker_fee":"0.0010",
+        "maker_fee":"0.0010",
+        "fee_discount":"1",
+        "fee_asset":null
+      }
+    ]
+  },
+  "id": 15
+}
+method: “order.query_stop”
+Note: This endpoint only queries orders with account 0
+Authorization: required, refer to server.sign
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+params[1]	Integer	Yes	side, 0: all, 1: sell, 2: buy
+params[2]	Integer	Yes	offset, that is, from which one to get
+params[3]	Integer	Yes	limit, the number of records obtained
+Return parameter description:
+
+Name	Type	Description
+total	Integer	Number of order results returned
+limit	Integer	Number of records obtained
+offset	Integer	Offset
+account	Integer	Account, spot account: 0
+money_fee	String	Trading fee calculated in quote coin
+state	Integer	The relationship between the stop price of a stop order and the current market price
+1: Lower than the price in the current market
+2: Higher than the price in the current market
+ctime	Float	Create time
+maker_fee	String	Maker rate
+price	String	Price
+fee_discount	String	Rate discount
+source	String	Source
+side	Integer	1: ask order, 2: bid order
+amount	String	Order amount, the minimum order amount is determined by the market
+user	Integer	User ID
+mtime	Float	Update time
+type	Integer	1: limit order, 2: market order
+id	Integer	Order id
+market	String	Market name
+stop_price	String	Stop Price
+taker_fee	String	Taker rate
+client_id	String	Client-defined id
+Account Order Query
+Example:
+
+// Request
+{
+  "method": "order.account_query",
+  "params": [
+    12,
+    "BTCUSDT",
+    0,
+    0,
+    10
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "records": [{
+      "asset_fee": "0",
+      "account": 1,
+      "money_fee": "0",
+      "stock_fee": "0",
+      "ctime": 1558680350.41878,
+      "maker_fee": "0.0001",
+      "price": "0.01900000",
+      "deal_stock": "0",
+      "fee_discount": "0.9000 ",
+      "side": 1,
+      "source": "api",
+      "amount": "1.00000000",
+      "user": 553,
+      "mtime": 1558680350.41878,
+      "fee_asset": "CET",
+      "deal_money": "0",
+      "left": "1.00000000",
+      "type": 1,
+      "id": 303,
+      "market": "BTCUSDT",
+      "taker_fee": "0.0001",
+      "client_id": "test_123",
+      "stop_id": 0
+    }], 
+    "total": 1,
+    "limit": 100,
+    "offset": 0
+  },
+  "id": 15
+}
+method: “order.account_query”
+Authorization: required, refer to server.sign
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	Integer	Yes	account, account
+spot account: 0
+margin account: See Acquire Market Info in Margin Account
+For querying all accounts: -1
+For querying account transactions that are > 0 : -2
+params[1]	String	Yes	market, market name
+params[2]	Integer	Yes	side, 0: all, 1: sell, 2: buy
+params[3]	Integer	Yes	offset, that is, from which one to get
+params[4]	Integer	Yes	limit, the number of records obtained
+Return parameter description:
+
+Name	Type	Description
+total	Integer	Number of order results returned
+limit	Integer	Number of records obtained
+offset	Integer	Offset
+asset_fee	String	Payment coin amount deducted as trading fees
+account	Integer	account, spot account: 0, margin account: See Acquire Market Info in Margin Account
+money_fee	String	Trading fee calculated in quote coin
+stock_fee	String	Trading fee calculated in base coin
+ctime	Float	Create time
+maker_fee	String	Maker rate
+price	String	Price
+deal_stock	String	Transaction value
+fee_discount	String	Rate discount
+source	String	Source
+side	Integer	1: ask order, 2: bid order
+amount	String	Order amount, the minimum order amount is determined by the market
+user	Integer	User ID
+mtime	Float	Update time
+fee_asset	String	Payment coin deducted as trading fees
+deal_money	String	Volume
+left	String	Remaining unexecuted volume
+type	Integer	1: limit order, 2: market order
+id	Integer	Order id
+market	String	Market name
+taker_fee	String	Taker rate
+client_id	String	Client-defined id
+stop_id	Integer	Stop order id
+Account Stop Order Query
+Example:
+
+// Request
+{
+  "method": "order.account_query_stop",
+  "params": [
+    12,
+    "BTCUSDT",
+    0,
+    0,
+    10
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "limit":10,
+    "offset":0,
+    "total":1,
+    "records":[
+      {
+        "id ":259,
+        "type":2,
+        "side":2,
+        "user":1415,
+        "account":0,
+        "option":68,
+        "state":1,
+        "ctime" :1640483195.167732,
+        "mtime":1640483195.167732,
+        "market":"BTCUSDT",
+        "source":"http_api_test",
+        "client_id":"",
+        "stop_price":"54999.00000000",
+        "price": "0",
+        "amount":"100000.00000000",
+        "taker_fee":"0.0010",
+        "maker_fee":"0.0010",
+        "fee_discount":"1",
+        "fee_asset":null
+      }
+    ]
+  },
+  "id": 15
+}
+method: “order.account_query_stop”
+Authorization: required, refer to server.sign
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	Integer	Yes	account, account
+spot account: 0
+margin account: See Acquire Market Info in Margin Account
+For querying all accounts: -1
+For querying account transactions that are > 0: -2
+params[1]	String	Yes	market, market name
+params[2]	Integer	Yes	side, 0: all, 1: sell, 2: buy
+params[3]	Integer	Yes	offset, that is, from which one to get
+params[4]	Integer	Yes	limit, the number of records obtained
+Return parameter description:
+
+Name	Type	Description
+total	Integer	Number of order results returned
+limit	Integer	Number of records obtained
+offset	Integer	Offset
+account	Integer	Account, spot account: 0
+money_fee	String	Trading fee calculated in quote coin
+ctime	Float	Create time
+maker_fee	String	Maker rate
+state	Integer	The relationship between the stop order trigger price and the current market price
+1: Lower than the price in the current market
+2: Higher than the price in the current market
+price	String	Price
+fee_discount	String	Rate discount
+source	String	Source
+side	Integer	1: ask order, 2: bid order
+amount	String	Order amount, the minimum order amount is determined by the market
+user	Integer	User ID
+mtime	Float	Update time
+type	Integer	1: limit order, 2: market order
+id	Integer	Order id
+market	String	Market name
+stop_price	String	Stop Price
+taker_fee	String	Taker rate
+client_id	String	Client-defined id
+Order Subscription
+Example:
+
+// Request
+{
+  "method": "order.subscribe",
+  "params": [
+    "BTCUSDT"
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “order.subscribe”
+Authorization: required, refer to server.sign
+Request parameter description:
+Name	Type	Required	Description
+params	Array\<String\>	Yes	market list, market list
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Order Push
+Example:
+
+// Notify
+{
+  "method": "order.update", 
+  "params": [
+    3,
+    [{
+      "asset_fee": "0",
+      "account": 1,
+      "money_fee": "0",
+      "stock_fee": "0",
+      "ctime": 1558680350.41878,
+      "maker_fee": "0.0001",
+      "price": "0.01900000",
+      "deal_stock": "0",
+      "fee_discount": "0.9000",
+      "side": 1,
+      "source": "api",
+      "amount": "1.00000000",
+      "user": 553,
+      "mtime": 1558680350.41878,
+      "fee_asset": "CET",
+      "deal_money": "0",
+      "left": "1.00000000",
+      "type": 1,
+      "id": 303,
+      "market": "BTCUSDT",
+      "taker_fee": "0.0001",
+      "client_id": "test_123",
+      "stop_id": 0
+    }]
+  ], 
+  "id": null
+}
+method: “order.udpate”
+Authorization: required, refer to server.sign
+Push parameter description:
+
+Name	Type	Description
+params[0]	Integer	event, event type, 1: PUT, 2: UPDATE, 3: FINISH
+asset_fee	String	Payment coin amount deducted as trading fees
+account	Integer	account, spot account: 0, margin account: See Acquire Market Info in Margin Account
+money_fee	String	Trading fee calculated in quote coin
+stock_fee	String	Trading fee calculated in base coin
+ctime	Float	Create time
+maker_fee	String	Maker rate
+price	String	Price
+deal_stock	String	Transaction value
+fee_discount	String	Rate discount
+source	String	Source
+side	Integer	1: ask order, 2: bid order
+amount	String	Order amount, the minimum order amount is determined by the market
+user	Integer	User ID
+mtime	Float	Update time
+fee_asset	String	Payment coin deducted as trading fees
+deal_money	String	Volume
+left	String	Remaining unexecuted volume
+type	Integer	1: limit order, 2: market order
+id	Integer	Order id
+market	String	Market name
+taker_fee	String	Taker rate
+client_id	String	Client-defined id
+stop_id	Integer	Stop order id
+Cancel Order Subscription
+Example:
+
+// Request
+{
+  "method": "order.unsubscribe",
+  "params": [],
+  "id":15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “order.unsubscribe”
+Authorization: required, refer to server.sign
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Asset Query
+Example:
+
+// Request
+{
+  "method": "asset.query",
+  "params": [
+    "BTC",
+    "ETH"
+  ],
+  "id": 15
+}
+
+// Response
+{
+  " error": null, 
+  "result": {
+    "BTC": {
+      "available": "5",
+      "frozen": "1",
+    },
+    "ETH": {
+      "available": " 5",
+      "frozen": "1",
+    }
+  },
+  "id": 15
+}
+method: “asset.query”
+Authorization: required, refer to server.sign
+Request parameter description:
+Name	Type	Required	Description
+params	Array\<String\>	Yes	asset list, asset list
+Return parameter description:
+
+Name	Type	Description
+available	String	Amount available
+frozen	String	Amount frozen
+Account Asset Query
+Example:
+
+// Request
+{
+  "method": "asset.account_query",
+  "params": [
+    0,
+    ["BTC","ETH"]
+  ],
+  "id": 15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "BTC": {
+      "available": "250",
+      "frozen": "10",
+    },
+    "ETH":{
+      " available": "250",
+      "frozen": "10",
+    }
+  },
+  "id": 15
+}
+method: “asset.account_query”
+Authorization: required, refer to server.sign
+Request parameter description:
+Name	Type	Required	Description
+params[0]	Integer	Yes	account, account
+spot account: 0
+margin account: See Acquire Market Info in Margin Account
+params[1]	Array\<String\>	Yes	asset list, asset list
+Return parameter description:
+
+Name	Type	Description
+available	String	Amount available
+frozen	String	Amount frozen
+All Asset Query
+Example:
+
+// Request
+{
+  "method":"asset.account_query_all",
+  "params":[],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "1": {
+      "BCH": {
+        "available": "990554.89473682",
+        "frozen": "9445.10526318"
+      }, 
+      "BTC": {
+        "available": "92.919825",
+        "frozen": "7.08000000"
+       }
+    }, 
+    "0": { 
+      "CET": {
+        "available": "999900473.1500094689", 
+        "frozen": "0"
+      }, 
+      "BCH": {
+        "available": "1002000200.00000000", 
+        "frozen": "0"
+      },
+      "BTC": {
+        "available": "100.00000000", 
+        "frozen": "0"
+      }
+    },
+    ... },
+  "id": 15
+}
+method: “asset.account_query_all”
+Authorization: required, refer to server.sign
+Return parameter description:
+
+Name	Type	Description
+available	String	Amount available
+frozen	String	Amount frozen
+Asset Subscription
+Example:
+
+// Request
+{
+  "method": "asset.subscribe",
+  "params": ["BTC"],
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  " id": 4,
+  "result": "success"
+}
+method: “asset.subscribe”
+Authorization: required, refer to server.sign
+Request parameter description:
+Name	Type	Required	Description
+params	Array\<String\>	Yes	asset list, asset list
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Asset Push
+Example:
+
+// Notify
+{
+  "method": "asset.update", 
+  "params": [
+    {
+      "BTC": {
+        "available": "250",
+        "frozen": "10",
+      }
+    }
+  ], 
+  "id": null
+}
+method: “asset.update”
+Authorization: required, refer to server.sign
+Push parameter description:
+
+Name	Type	Description
+available	String	Amount available
+frozen	String	Amount frozen
+Cancel Asset Subscription
+Example:
+
+// Request
+
+{
+  "method": "asset.unsubscribe",
+  "params": [],
+  "id": 15
+}
+
+// Response
+{
+  "error": null,
+  "id": 4,
+  "result": "success"
+}
+method: “asset.unsubscribe”
+Authorization: required, refer to server.sign
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Index Price Query
+Example:
+
+// Request
+{
+  "method":"index.query",
+  "params":[
+    "BTCUSDT",
+  ],
+  "id":15
+}
+
+// Response
+{
+  "error": null , 
+  "result": {
+    "name": "BTCUSDT",
+    "time": 1637548343,
+    "index": "57000.00"
+  },
+  "id": 15
+}
+method: “index.query”
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	String	Yes	market, market name
+Return parameter description:
+
+Name	Type	Description
+name	String	Market name
+time	Integer	Timestamp
+index	String	Index Price
+Index Price Query In All Markets
+Example:
+
+// Request
+{
+  "method":"index.list",
+  "params":[],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": {
+    "BTC": {
+      "time": 1637564110000, 
+      "index": "239094157.9068"
+    }, 
+    "HCUSDT": {
+      "time": 1637564110000, 
+      "index": "1.005"
+    }, 
+    "BSVUSDT": {
+      "time": 1637564110000, 
+      "index": "155.54000000"
+    },
+    ... },
+  "id": 15
+}
+method: “index.list”
+Return parameter description:
+
+Name	Type	Description
+time	Integer	Timestamp
+index	String	Index Price
+Index Price Subscription
+Example:
+
+// Request
+{
+  "method": "index.subscribe",
+  "params": [],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+method: “index.subscribe”
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Index Price Push
+Example:
+
+// Notify
+{
+  "method": "index.update",
+  "params": [
+    "BTCUSDT",
+    "57000.00"
+  ],
+  "id": null
+}
+method: “index.update”
+Push parameter description:
+
+Name	Type	Description
+params[0]	String	Market name
+params[1]	String	Index Price
+Cancel Index Price Subscription
+Example:
+
+// Request
+{
+  "method": "index.unsubscribe",
+  "params": [],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+method: “index.unsubscribe”
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Temporary Maintenance Notice Subscription
+Example:
+
+// Request
+{
+  "method": "notice.subscribe",
+  "params": [
+    101
+  ],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+Method: “notice.subscribe”
+Authorization: required, refer to server.sign
+Request parameter description:
+
+Name	Type	Required	Description
+params[0]	Integer	Yes	101, temporary maintenance notice
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Temporary Maintenance Notice Push
+Example:
+
+// Notify
+{
+  "method": "notice.update",
+  "params": [
+    101,
+    {
+      "started_at": 1655347758, 
+      "ended_at": 1656556940, 
+      "scope": ["SPOT"]
+    }
+  ],
+  "id": null
+}
+Method: “notice.update”
+Push parameter description:
+Name	Type	Description
+params[0]	Integer	Subscription ID, 101 for temporary maintenance notice
+params[1]	Object	Maintenance details
+started_at	Integer	Maintenance start time
+ended_at	Integer	Maintenance end time
+scope	Array\<String\>	Maintenance scope: PERPETUAL: Futures, SPOT: Spot
+Cancel Temporary Maintenance Notice Subscription
+Example:
+
+// Request
+{
+  "method": "notice.unsubscribe",
+  "params": [],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+Method: “notice.unsubscribe”
+Authorization: required, refer to server.sign
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Personal Transaction Info Subscription
+Example:
+
+// Request
+{
+  "method": "deals_own.subscribe",
+  "params": [
+    "BTCUSDT"
+  ],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+Method: “deals_own.subscribe”
+Authorization: required, refer to server.sign
+Request parameter description:
+Name	Type	Required	Description
+params	Array\<String\>	No	Market list, empty to subscribe to all markets
+Return parameter description:
+
+Name	Type	Description
+result	String	Subscription results
+Personal Transaction Info Push
+Example:
+
+// Notify
+{
+  "method": "deals_own.update",
+  "params": [
+    "BTCUSDT",
+    [
+      {
+        "type": "sell",
+        "time": 1496458040.059284,
+        "price": "46444.74",
+        "id": 29433,
+        "amount": "0.00120000",
+        "order_id": 523941,
+        "client_id": ""
+      }
+    ]
+  ],
+  "id": null
+}
+Method: “deals_own.update”
+Push parameter description:
+
+Name	Type	Description
+params[0]	String	Market
+type	String	Type, “sell”: sell, “buy”: buy
+time	float	Timestamp
+price	String	Price
+id	Integer	No.
+amount	String	Amount
+order_id	Integer	Order id
+client_id	String	Client id
+Cancel Personal Transaction Info Subscription
+Example:
+
+// Request
+{
+  "method": "deals_own.unsubscribe",
+  "params": [],
+  "id":15
+}
+
+// Response
+{
+  "error": null, 
+  "result": "success",
+  "id": 15
+}
+Method: “deals_own.unsubscribe”
+Authorization: required, refer to server.sign
+Return parameter description:
+
+Name	Type	Description
+result	String	Cancel subscription result
+Exclusive MM Contact
+Telegram @CoinExvipmanager
+Email vip@coinex.com
+✕
